@@ -1,0 +1,1 @@
+key=virtual_key_add(x-16,y-16,32,104,vk_up);

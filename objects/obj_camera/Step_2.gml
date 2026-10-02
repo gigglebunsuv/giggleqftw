@@ -2,6 +2,12 @@
 
 if (!instance_exists(obj_link)) exit;
 
+//Dungeons: free camera inside zones, slide between them (see cam_zones)
+if (instance_exists(obj_cam_zone)) {
+	cam_zone_step(view_camera[0]);
+	exit;
+}
+
 cam_flip_target(view_camera[0]);
 
 if(abs(x - target_x) <camspd){

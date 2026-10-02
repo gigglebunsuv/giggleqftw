@@ -1,6 +1,6 @@
 //Keyboard + XInput gamepad input.
-//Keyboard: arrows move, Z = A button, X = B button, Enter = menu confirm.
-//Gamepad:  d-pad or left stick move, A/B buttons, Start or A = menu confirm.
+//Keyboard: arrows move, Z = A button, X = B button, Enter = menu confirm / pause.
+//Gamepad:  d-pad or left stick move, A/B buttons, Start or A = menu confirm, Start = pause.
 
 //Runs once at game start
 global.input_pad = -1;			//XInput slot (0-3) in use, -1 = none connected
@@ -13,7 +13,8 @@ global.input_using_pad = false;	//true if the gamepad was used last (HUD shows p
 function input_get() {
 	//Sets on the calling instance:
 	//move_up, move_down, move_left, move_right (held)
-	//act_a, act_b (pressed), menu_move (-1 up, 1 down), pad_accept (gamepad confirm only)
+	//act_a, act_b, act_start (pressed), menu_move (-1 up, 1 down), menu_move_h (-1 left, 1 right),
+	//pad_accept (gamepad confirm only)
 	var pad = input_find_pad();
 
 	//Swap HUD glyphs to whichever device was touched last
@@ -26,7 +27,9 @@ function input_get() {
 	move_right = keyboard_check(vk_right);
 	act_a = keyboard_check_pressed(ord("Z"));
 	act_b = keyboard_check_pressed(ord("X"));
+	act_start = keyboard_check_pressed(vk_enter);
 	menu_move = keyboard_check_pressed(vk_down) - keyboard_check_pressed(vk_up);
+	menu_move_h = keyboard_check_pressed(vk_right) - keyboard_check_pressed(vk_left);
 	pad_accept = false;
 
 	if (pad != -1) {
@@ -41,6 +44,9 @@ function input_get() {
 		act_b = act_b || gamepad_button_check_pressed(pad, gp_face2);
 		menu_move += gamepad_button_check_pressed(pad, gp_padd) - gamepad_button_check_pressed(pad, gp_padu);
 		menu_move = clamp(menu_move, -1, 1);
+		menu_move_h += gamepad_button_check_pressed(pad, gp_padr) - gamepad_button_check_pressed(pad, gp_padl);
+		menu_move_h = clamp(menu_move_h, -1, 1);
+		act_start = act_start || gamepad_button_check_pressed(pad, gp_start);
 		pad_accept = gamepad_button_check_pressed(pad, gp_face1) || gamepad_button_check_pressed(pad, gp_start);
 	}
 

@@ -58,3 +58,22 @@ function player_add_arrows(argument0) {
 
 
 }
+
+///player_hurt(amount, from_x, from_y);
+function player_hurt(argument0, argument1, argument2) {
+	//Damages Link and knocks him away from (from_x, from_y).
+	//Ignored while he's still flashing from the last hit.
+	with (obj_link) {
+		if (hurt_timer <= 0) {
+			player_add_health(-argument0);
+			hurt_timer = 60;
+			if (state == "idle") {spr_prev = sprite_index}
+			state = "hurt";
+			cnt = 0;
+			dur = 8;
+			kb_dir = point_direction(argument1, argument2, x, y);
+		}
+	}
+
+
+}

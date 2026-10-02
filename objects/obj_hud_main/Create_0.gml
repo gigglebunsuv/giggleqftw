@@ -1,22 +1,21 @@
-/// @description HUD layout (Zelda 1 style)
+/// @description HUD layout
 
-//Positions inside the HUD band (top HUD_HEIGHT pixels of the view)
+//Top: hearts and magic, counters, item boxes in the right corner
 hud_y = 4;
 life_x = 8;		//hearts and magic
-count_x = 80;	//counters, 2x2: money/keys, then bombs/arrows
-count_y = 6;
-count_col = 44;	//space between counter columns
-count_row = 12;	//space between counter rows
-btn_b_x = 168;	//item boxes
-btn_a_x = 192;
-btn_y = 4;
-map_x = 220;	//minimap area
-map_y = 4;
-map_w = 28;
+count_x = 80;	//money, bombs, arrows (one row)
+count_gap = 4;	//space between counters
+btn_margin = 8;	//item boxes, from the right edge
+btn_gap = 4;	//space between the B and A boxes
+
+//Bottom left: minimap with the key counter next to it
+map_x = 8;
+map_margin = 6;	//from the bottom edge
+map_w = 32;
 map_h = 24;
+key_gap = 4;	//space between the map and the key counter
 
 //Placeholder colours
-hud_bg_col = c_black;
 hud_map_col = make_colour_rgb(116,116,116);
 hud_dot_col = make_colour_rgb(128,208,16);
 

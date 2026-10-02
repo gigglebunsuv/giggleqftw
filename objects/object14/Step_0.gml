@@ -14,7 +14,8 @@ if (l > string_length(str)+100) && (next < array_length_1d(strings)-1)
 }
 str = strings[next];
 
-if (keyboard_check_direct(vk_space))
+var pad = input_find_pad();
+if (keyboard_check_direct(vk_space) || (pad != -1 && gamepad_button_check(pad, gp_face1)))
 {
 	holdspace++;
 }

@@ -1,6 +1,9 @@
 
 
-menu_move = keyboard_check_pressed(vk_down) - keyboard_check_pressed(vk_up);
+input_get();
+
+//Gamepad A / Start runs the same code as Enter
+if (pad_accept) {event_perform(ev_keypress, vk_enter)}
 
 menu_index += menu_move;
 if (menu_index < 0) menu_index = buttons - 1;

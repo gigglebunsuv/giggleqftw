@@ -1,7 +1,8 @@
-/// @description Insert description here
-// You can write your code in this editor
+/// @description Flip-screen camera vars
 
 target_x = 0
 target_y = 0
 camspd = 10;
-view_camera[0] = camera_create_view(0,0,160,144,0,-1,-1,-1,0,0);
+
+//View size comes from the room's View 0 settings (256x176, or 160x144 in Map),
+//so no camera is created here. That stops a new camera leaking every room.

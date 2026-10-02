@@ -1,16 +1,31 @@
 //Get Input
-input_get(0);
+input_get();
 
-if (keyboard_check_pressed(vk_control)) {
-	global.pHealth -= 1;
-}
+//Use equipped items (only the sword so far)
+act_attack = (act_a && global.itemA == spr_hud_item_sword) || (act_b && global.itemB == spr_hud_item_sword);
+
+//Debug keys
+//	Ctrl  = lose half a heart	H = heal half a heart
+//	Shift = use 4 magic			M = restore 4 magic
+//	J     = add a heart container (up to 16)
+//	1-4   = add 10 money, 1 key, 1 bomb, 5 arrows
+if (keyboard_check_pressed(vk_control))	{player_add_health(-1)}
+if (keyboard_check_pressed(ord("H")))	{player_add_health(1)}
+if (keyboard_check_pressed(vk_shift))	{player_add_magic(-4)}
+if (keyboard_check_pressed(ord("M")))	{player_add_magic(4)}
+if (keyboard_check_pressed(ord("J")))	{player_add_heart()}
+if (keyboard_check_pressed(ord("1")))	{player_add_money(10)}
+if (keyboard_check_pressed(ord("2")))	{player_add_keys(1)}
+if (keyboard_check_pressed(ord("3")))	{player_add_bombs(1)}
+if (keyboard_check_pressed(ord("4")))	{player_add_arrows(5)}
 
 if global.pHealth < 0 {
 	global.pHealth = 0;
 }
-if global.pHealth > 6 {
-	global.pHealth = 6;
+if global.pHealth > global.pHealthMax {
+	global.pHealth = global.pHealthMax;
 }
+global.pMagic = clamp(global.pMagic, 0, global.pMagicMax);
 
 xx = move_right - move_left;
 yy = move_down - move_up;

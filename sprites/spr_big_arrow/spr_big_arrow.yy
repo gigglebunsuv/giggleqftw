@@ -36,8 +36,8 @@
   "nineSlice": null,
   "origin": 0,
   "parent": {
-    "name": "Sprites",
-    "path": "folders/Sprites.yy",
+    "name": "QFTW Demo",
+    "path": "folders/Sprites/QFTW Demo.yy",
   },
   "preMultiplyAlpha": false,
   "sequence": {

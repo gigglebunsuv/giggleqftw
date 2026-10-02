@@ -6,8 +6,8 @@
   "managed": true,
   "overriddenProperties": [],
   "parent": {
-    "name": "Objects",
-    "path": "folders/Objects.yy",
+    "name": "Old",
+    "path": "folders/Objects/HUD/Old.yy",
   },
   "parentObjectId": null,
   "persistent": true,

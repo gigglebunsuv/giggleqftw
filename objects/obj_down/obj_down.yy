@@ -8,8 +8,8 @@
   "managed": true,
   "overriddenProperties": [],
   "parent": {
-    "name": "Objects",
-    "path": "folders/Objects.yy",
+    "name": "Touch Controls",
+    "path": "folders/Objects/Touch Controls.yy",
   },
   "parentObjectId": null,
   "persistent": false,

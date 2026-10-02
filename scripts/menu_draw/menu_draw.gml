@@ -42,10 +42,18 @@ function menu_draw_box(argument0, argument1, argument2, argument3) {
 ///menu_draw_text(x, y, string);
 function menu_draw_text(argument0, argument1, argument2) {
 	//White text with a 1px black shadow. Uses the current font and alignment.
+	menu_draw_text_colour(argument0, argument1, argument2, c_white);
+
+
+}
+
+///menu_draw_text_colour(x, y, string, colour);
+function menu_draw_text_colour(argument0, argument1, argument2, argument3) {
 	draw_set_colour(c_black);
 	draw_text(argument0 + 1, argument1 + 1, argument2);
-	draw_set_colour(c_white);
+	draw_set_colour(argument3);
 	draw_text(argument0, argument1, argument2);
+	draw_set_colour(c_white);
 
 
 }

@@ -1,3 +1,6 @@
+//Dead: obj_player_death handles the spin and the game over screen
+if (state == "dead") exit;
+
 //Get Input
 input_get();
 
@@ -63,6 +66,12 @@ if global.pHealth > global.pHealthMax {
 	global.pHealth = global.pHealthMax;
 }
 global.pMagic = clamp(global.pMagic, 0, global.pMagicMax);
+
+//Out of health
+if (global.pHealth <= 0) {
+	player_die();
+	exit;
+}
 
 //Flash after getting hurt
 if (hurt_timer > 0) {hurt_timer--}

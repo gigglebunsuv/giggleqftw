@@ -36,5 +36,5 @@
     "path": "sprites/spr_dungeon_wall/spr_dungeon_wall.yy",
   },
   "spriteMaskId": null,
-  "visible": true,
+  "visible": false,
 }

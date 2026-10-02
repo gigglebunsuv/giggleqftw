@@ -58,6 +58,10 @@ kb_dir = 0;
 level = 0;
 base_depth = depth;
 
+//Where Link entered the current room: CONTINUE on the game over screen starts him here
+entry_x = x;
+entry_y = y;
+
 //HUD
 if (!instance_exists(obj_hud_main)) {
 	instance_create_depth(0,0,-100,obj_hud_main);

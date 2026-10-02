@@ -33,5 +33,5 @@
     "path": "sprites/spr_dungeon_bridge/spr_dungeon_bridge.yy",
   },
   "spriteMaskId": null,
-  "visible": true,
+  "visible": false,
 }

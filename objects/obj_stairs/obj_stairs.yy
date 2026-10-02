@@ -34,5 +34,5 @@
     "path": "sprites/spr_dungeon_stairs/spr_dungeon_stairs.yy",
   },
   "spriteMaskId": null,
-  "visible": true,
+  "visible": false,
 }

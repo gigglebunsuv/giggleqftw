@@ -66,6 +66,7 @@ function player_hurt(argument0, argument1, argument2) {
 	with (obj_link) {
 		if (hurt_timer <= 0) {
 			player_add_health(-argument0);
+			if (global.pHealth > 0) {sfx_play(SFX_PLAYER_HURT)}
 			hurt_timer = 60;
 			if (state == "idle") {spr_prev = sprite_index}
 			state = "hurt";
@@ -74,6 +75,19 @@ function player_hurt(argument0, argument1, argument2) {
 			kb_dir = point_direction(argument1, argument2, x, y);
 		}
 	}
+
+
+}
+
+///player_die();
+function player_die() {
+	//Run by obj_link when his health hits zero: spin, fade, game over screen (obj_player_death)
+	if (state == "dead") return;
+	state = "dead";
+	image_alpha = 1;
+	image_speed = 0;
+	hurt_timer = 0;
+	instance_create_depth(0, 0, -2000, obj_player_death);
 
 
 }

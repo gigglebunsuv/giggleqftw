@@ -44,7 +44,13 @@ function enemy_hurt(argument0, argument1, argument2, argument3) {
 			hurt_timer = 20;
 			kb_timer = 6;
 			kb_dir = point_direction(argument2, argument3, x, y);
-			if (hp <= 0) {instance_destroy()}
+			if (hp <= 0) {
+				instance_create_depth(x, y, depth - 1, obj_enemy_death);
+				sfx_play(SFX_ENEMY_DIE);
+				instance_destroy();
+			} else {
+				sfx_play(SFX_ENEMY_HIT);
+			}
 		}
 	}
 

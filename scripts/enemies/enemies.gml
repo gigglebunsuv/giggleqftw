@@ -2,7 +2,10 @@
 //knockback, flashing and hurting Link on contact.
 //
 //Enemy variables (set in the child's Create after event_inherited()):
-//	hp, contact_damage, level (0 lower, 1 upper, -1 flying = any level)
+//	hp, contact_damage, level (0 lower, 1 upper, -1 flying = any level),
+//	boomerang_kills (true = the boomerang kills it instead of stunning it)
+//
+//Children skip their own AI while active is false, kb_timer > 0 or stun_timer > 0.
 
 ///enemy_is_active();
 function enemy_is_active() {
@@ -52,6 +55,17 @@ function enemy_hurt(argument0, argument1, argument2, argument3) {
 				sfx_play(SFX_ENEMY_HIT);
 			}
 		}
+	}
+
+
+}
+
+///enemy_stun(enemy, time);
+function enemy_stun(argument0, argument1) {
+	//Freezes an enemy (boomerang, grapple hook): it can't move or hurt Link until it wears off.
+	with (argument0) {
+		if (stun_timer <= 0) {sfx_play(SFX_ENEMY_STUN)}
+		stun_timer = max(stun_timer, argument1);
 	}
 
 

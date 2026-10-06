@@ -1,0 +1,2 @@
+equip = "refill";
+remember = false;

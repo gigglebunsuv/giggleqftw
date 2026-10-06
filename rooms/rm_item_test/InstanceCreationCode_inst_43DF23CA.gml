@@ -1,0 +1,1 @@
+item = ITEM.LIGHTNING_ROD;

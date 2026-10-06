@@ -1,0 +1,1 @@
+equip = "bomb_bag";

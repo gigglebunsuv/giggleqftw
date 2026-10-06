@@ -1,6 +1,9 @@
 //Swing: the blade sweeps 180 degrees across the way Link is facing.
 //spr_sword_swing points right with its origin on the hilt, so image_angle aims it.
+//One frame per sword tier: iron, red, magical, Sword of Bun.
 sprite_index = spr_sword_swing;
+image_speed = 0;
+image_index = global.swordTier - 1;
 visible = true;
 
 //Set timer

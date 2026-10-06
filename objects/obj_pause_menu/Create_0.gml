@@ -1,8 +1,7 @@
-/// @description Pause screen (A Link to the Past style)
+/// @description Pause screen (pages are in the pause_menu script)
 
-//Freeze the game. Deactivated instances stop drawing too,
-//so keep a picture of the last frame to draw underneath the menu.
-snap = sprite_create_from_surface(application_surface, 0, 0, surface_get_width(application_surface), surface_get_height(application_surface), false, false, 0, 0);
+//The map needs Link and the camera zones, so take it before everything is deactivated
+map = menu_map_build();
 instance_deactivate_all(true);
 
 menu_font = font_add_sprite_ext(spr_menu_font, " ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-:!?.'/", false, 0);
@@ -10,25 +9,29 @@ menu_font = font_add_sprite_ext(spr_menu_font, " ABCDEFGHIJKLMNOPQRSTUVWXYZ01234
 //Skip input on the first step: the button that opened the menu still counts as pressed
 opened = false;
 
-//Item grid (slot number = item number, see the items script)
+//Pages: 0 = items, 1 = quest, 2 = settings ([ and ] / LB and RB switch)
+page = 0;
+
+//Items page: the grid (slot number = item number, see the items script)
 grid_cols = 5;
 grid_rows = 4;
-cell = 28;
-cursor = max(0, global.itemA);	//start on the equipped item
+cell = 24;
+grid = item_grid();	//which item is in each slot
+cursor = max(0, item_grid_slot(global.itemA));	//start on the equipped item
 
-//Layout (GUI is the size of the view, 256x176)
-items_x = 4;	//left: items
-items_y = 4;
-items_w = 148;
-items_h = 168;
+//Settings page
+set_choices = ["RESUME", "OPTIONS", "MAIN MENU"];
+set_cursor = 0;
+confirm_quit = false;	//pressed A once on Main menu: press again to go to the title
+show_options = false;	//showing the Options screen (controls, volume: see the options_menu script)
+
+//Layout (GUI is the whole window, 256x208). The page names are along the top.
+page_y = 24;	//pages start under the page names
+page_h = 180;
+items_x = 4;	//items page: grid on the left
+items_w = 132;
 grid_x = items_x + (items_w - grid_cols * cell) div 2;
-grid_y = items_y + 18;
-
-side_x = 156;	//right column
-side_w = 96;
-sel_y = 4;		//selected item
-sel_h = 44;
-bun_y = 52;		//The Bun
-bun_h = 52;
-equip_y = 108;	//equipment
-equip_h = 64;
+grid_y = page_y + 18;
+side_x = 140;	//items page: right column (wide enough for 13 letters)
+side_w = 112;
+options_open((page_h - 40) div 10);

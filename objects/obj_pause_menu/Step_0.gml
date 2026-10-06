@@ -1,4 +1,4 @@
-/// @description Move the cursor, equip, close
+/// @description Switch pages, close, then the open page's controls
 
 input_get();
 
@@ -7,24 +7,22 @@ if (!opened) {
 	exit;
 }
 
-//Close with Start/Enter or B
-if (act_start || act_b) {
-	instance_activate_all();
-	global.pause_block = true;	//so Link ignores this button press
-	instance_destroy();
+//Close with Start/Enter, or B (on the Options screen B goes back instead)
+if (act_start || (act_b && !show_options)) {
+	pause_close();
 	exit;
 }
 
-//Move around the grid (wraps at the edges)
-if (menu_move_h != 0 || menu_move != 0) {
-	var cx = ((cursor mod grid_cols) + menu_move_h + grid_cols) mod grid_cols;
-	var cy = ((cursor div grid_cols) + menu_move + grid_rows) mod grid_rows;
-	cursor = cy * grid_cols + cx;
+//Switch pages: [ and ] (LB and RB)
+if (menu_page != 0) {
+	page = (page + menu_page + PAUSE_PAGES) mod PAUSE_PAGES;
+	show_options = false;
+	confirm_quit = false;
 	audio_play_sound(menu_switch, 2, false);
+	exit;
 }
 
-//Put the item under the cursor on A
-if (act_a && cursor < ITEM.COUNT && global.item_have[cursor]) {
-	global.itemA = cursor;
-	audio_play_sound(menu_select, 3, false);
+switch (page) {
+	case 0: pause_step_items(); break;
+	case 2: pause_step_settings(); break;
 }

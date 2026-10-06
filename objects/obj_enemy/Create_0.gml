@@ -10,3 +10,5 @@ hurt_timer = 0;
 kb_timer = 0;
 kb_dir = 0;
 kb_speed = 3;
+stun_timer = 0;			//frozen by the boomerang or grapple hook
+boomerang_kills = false;	//true: the boomerang kills it instead

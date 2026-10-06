@@ -1,0 +1,2 @@
+//Starts lit
+lit = true;

@@ -9,8 +9,9 @@ if (instance_number(obj_link) > 1) {
 mask_index = spr_link_down;
 
 //Vars
-spd = (sprite_width/8);
-ani = (spd*0.1)*image_number;
+spd = WALK_SPEED;	//see the player_moves script
+move_frac_x = 0;	//leftover fractions of a pixel (see player_move)
+move_frac_y = 0;
 grd=sprite_width;
 dir="right";
 state="idle";
@@ -27,20 +28,33 @@ global.pKeysMax = 99;
 global.pBombs = 0;
 global.pBombsMax = 8;
 global.pArrows = 10;
-global.pArrowsMax = 30;
+global.pArrowsMax = 20;
+global.bombLevel = 0;	//capacity upgrades, see player_upgrade_bombs/arrows
+global.arrowLevel = 0;
 
 //Items (see the items script). Starts with the bow on A for now.
 global.item_have = array_create(ITEM.COUNT, false);
 global.itemA = ITEM.NONE;
+global.itemY = ITEM.NONE;
+global.shieldTier = 0;	//the shield is an item, see shield_set_tier
+global.bottles = array_create(BOTTLES, BOTTLE.EMPTY);	//what's in each bottle
 item_give(ITEM.BOW);
+item_give(ITEM.FLUTE);	//Link starts with the flute
 
 //Equipment tiers (0 = none). The sword is always on B.
 global.swordTier = 1;
-global.shieldTier = 0;
 global.armorTier = 1;
+
+//Equipment you have or don't
+global.hasBoots = false;	//preassigned
+global.hasGloves = false;	//passive
+global.hasFlippers = false;	//passive
 
 //The Bun, one piece per dungeon
 global.bunPieces = array_create(BUN_PIECES, false);
+
+//Story flags set by conversations (see the dialogue_system script), cleared for a new game
+global.flags = {};
 
 //Set by the pause screen when it closes, so Link ignores that button press
 global.pause_block = false;
@@ -48,6 +62,36 @@ global.pause_block = false;
 //Dungeon camera (see cam_zones): the zone Link is in, and whether it's sliding to a new one
 global.cam_zone = noone;
 global.cam_transition = false;
+
+//Shield raised (holding the shield's button), and how fast Link walks with it up
+shielding = false;
+shield_spd = 0.5;
+
+//Equipment moves (see the player_moves script)
+swimming = false;	//in deep water with the flippers
+lift_timer = 0;		//walking into a heavy rock with the strength gloves
+carrying = false;	//holding a heavy rock over his head
+
+//Animation (see player_animate): frame timer, 0/1/2 standing/walking/running, and the
+//sword/hammer/rock pose frame (-1 = none)
+anim_timer = 0;
+anim_rate = 0;
+pose = -1;
+
+//The cape's jump (see player_jump_step): steps in the air, height off the ground,
+//and the speed he's carried along at
+jump_t = 0;
+z = 0;
+air_h = 0;
+air_v = 0;
+hspd = 0;
+vspd = 0;
+
+//Pits (see player_pit_check): steps over the edge, steps falling, last safe spot
+fall_grace = 0;
+fall_t = 0;
+safe_x = x;
+safe_y = y;
 
 //Getting hurt (see player_hurt)
 hurt_timer = 0;

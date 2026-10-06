@@ -1,0 +1,2 @@
+equip = "bun";
+remember = false;

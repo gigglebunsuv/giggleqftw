@@ -34,7 +34,7 @@ if (phase == "spin") {
 				image_alpha = 1;
 				x = entry_x;
 				y = entry_y;
-				sprite_index = spr_link_down;
+				sprite_index = player_get_sprite("down");
 				dir = "down";
 			}
 			instance_activate_all();

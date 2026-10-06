@@ -1,0 +1,2 @@
+equip = "flippers";
+remember = false;

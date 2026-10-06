@@ -3,3 +3,4 @@
 
 speed = 2.5;
 level = 0;
+shield_tier = 1;	//any shield blocks it

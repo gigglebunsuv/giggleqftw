@@ -1,0 +1,2 @@
+equip = "heart";
+remember = false;

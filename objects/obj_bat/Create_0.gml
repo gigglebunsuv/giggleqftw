@@ -3,6 +3,7 @@
 event_inherited();
 hp = 1;
 contact_damage = 1;
+boomerang_kills = true;
 level = -1;			//flying: hits Link on either floor, ignores walls
 depth = DEPTH_FLYING;
 

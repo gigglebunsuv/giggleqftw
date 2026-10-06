@@ -210,7 +210,7 @@
 28,29,53,220,220,208,144,-8,145,14,146,201,45,46,47,208,145,146,220,305,220,144,145,145,-4,229,14,200,201,229,229,220,53,48,50,48,53,220,220,208,
 144,-8,145,8,146,177,49,51,49,208,145,146,-3,305,4,144,376,145,145,-8,229,9,52,497,145,497,52,220,120,208,144,-8,145,2,146,201,-5,145,5,146,
 220,305,220,144,-4,145,-2,229,1,220,-3,229,2,376,121,-3,145,-2,121,3,145,208,168,-8,169,2,170,177,-6,145,-3,121,-5,145,1,376,-4,229,-9,145,
-1,208,-10,-2147483648,1,201,-29,208,-10,-2147483648,],"TileDataFormat":1,},"tilesetId":{"name":"tileset0","path":"tilesets/tileset0/tileset0.yy",},"userdefinedDepth":false,"visible":true,"x":0,"y":0,},
+1,208,-10,-2147483648,1,201,-29,208,-10,-2147483648,],"TileDataFormat":1,},"tilesetId":{"name":"tile_overworld","path":"tilesets/tile_overworld/tile_overworld.yy",},"userdefinedDepth":false,"visible":true,"x":0,"y":0,},
     {"resourceType":"GMRBackgroundLayer","resourceVersion":"1.0","name":"Background","animationFPS":15.0,"animationSpeedType":0,"colour":4278190080,"depth":400,"effectEnabled":true,"effectType":null,"gridX":32,"gridY":32,"hierarchyFrozen":false,"hspeed":0.0,"htiled":false,"inheritLayerDepth":false,"inheritLayerSettings":false,"inheritSubLayers":true,"inheritVisibility":true,"layers":[],"properties":[],"spriteId":null,"stretch":false,"userdefinedAnimFPS":false,"userdefinedDepth":false,"visible":true,"vspeed":0.0,"vtiled":false,"x":0,"y":0,},
   ],
   "parent": {

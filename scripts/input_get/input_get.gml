@@ -1,6 +1,9 @@
 //Keyboard + XInput gamepad input.
-//Keyboard: arrows move, Z = A button, X = B button, Enter = menu confirm / pause.
-//Gamepad:  d-pad or left stick move, A/B buttons, Start or A = menu confirm, Start = pause.
+//Keyboard: arrows move, Z = A button, X = B button, C = Y button, S = run (boots), Enter = menu confirm / pause,
+//          [ and ] = previous / next pause screen page.
+//Gamepad:  d-pad or left stick move, A/B/Y buttons, right trigger = run, Start or A = menu confirm, Start = pause,
+//          LB / RB = previous / next pause screen page.
+//The list shown on the Options screen (Controls, see options_menu) is input_bind_list(): update it when these change.
 
 //Runs once at game start
 global.input_pad = -1;			//XInput slot (0-3) in use, -1 = none connected
@@ -13,7 +16,7 @@ global.input_using_pad = false;	//true if the gamepad was used last (HUD shows p
 function input_get() {
 	//Sets on the calling instance:
 	//move_up, move_down, move_left, move_right (held)
-	//act_a, act_b, act_start (pressed), menu_move (-1 up, 1 down), menu_move_h (-1 left, 1 right),
+	//act_a, act_b, act_y, act_start (pressed), menu_page (-1 previous, 1 next page), hold_a, hold_y, hold_run (held), menu_move (-1 up, 1 down), menu_move_h (-1 left, 1 right),
 	//pad_accept (gamepad confirm only)
 	var pad = input_find_pad();
 
@@ -27,7 +30,12 @@ function input_get() {
 	move_right = keyboard_check(vk_right);
 	act_a = keyboard_check_pressed(ord("Z"));
 	act_b = keyboard_check_pressed(ord("X"));
+	act_y = keyboard_check_pressed(ord("C"));
+	hold_a = keyboard_check(ord("Z"));
+	hold_y = keyboard_check(ord("C"));
+	hold_run = keyboard_check(ord("S"));
 	act_start = keyboard_check_pressed(vk_enter);
+	menu_page = keyboard_check_pressed(221) - keyboard_check_pressed(219);	//] and [ (Windows key codes)
 	menu_move = keyboard_check_pressed(vk_down) - keyboard_check_pressed(vk_up);
 	menu_move_h = keyboard_check_pressed(vk_right) - keyboard_check_pressed(vk_left);
 	pad_accept = false;
@@ -42,11 +50,17 @@ function input_get() {
 		move_right = move_right || gamepad_button_check(pad, gp_padr) || lh > INPUT_STICK_PRESS;
 		act_a = act_a || gamepad_button_check_pressed(pad, gp_face1);
 		act_b = act_b || gamepad_button_check_pressed(pad, gp_face2);
+		act_y = act_y || gamepad_button_check_pressed(pad, gp_face4);
+		hold_a = hold_a || gamepad_button_check(pad, gp_face1);
+		hold_y = hold_y || gamepad_button_check(pad, gp_face4);
+		hold_run = hold_run || gamepad_button_check(pad, gp_shoulderrb);
 		menu_move += gamepad_button_check_pressed(pad, gp_padd) - gamepad_button_check_pressed(pad, gp_padu);
 		menu_move = clamp(menu_move, -1, 1);
 		menu_move_h += gamepad_button_check_pressed(pad, gp_padr) - gamepad_button_check_pressed(pad, gp_padl);
 		menu_move_h = clamp(menu_move_h, -1, 1);
 		act_start = act_start || gamepad_button_check_pressed(pad, gp_start);
+		menu_page += gamepad_button_check_pressed(pad, gp_shoulderr) - gamepad_button_check_pressed(pad, gp_shoulderl);
+		menu_page = clamp(menu_page, -1, 1);
 		pad_accept = gamepad_button_check_pressed(pad, gp_face1) || gamepad_button_check_pressed(pad, gp_start);
 	}
 
@@ -94,6 +108,61 @@ function input_pad_any(argument0) {
 
 	return abs(gamepad_axis_value(pad, gp_axislh)) > INPUT_STICK_PRESS
 		|| abs(gamepad_axis_value(pad, gp_axislv)) > INPUT_STICK_PRESS;
+
+
+}
+
+///input_bind_list();
+function input_bind_list() {
+	//What the Options screen's Controls list shows (title screen and pause Settings page). Each row is [type, ...]:
+	//	[0, title]						section heading
+	//	[1, action, keyboard, gamepad]	a control
+	//	[2, key, what it does]			a debug key (keyboard only)
+	//	[3, text]						a note
+	//Only capital letters, numbers and - : ! ? . ' / (the menu font). Keep it in step with
+	//input_get() and the debug keys in obj_link's Step event.
+	return [
+		[0, "CONTROLS"],
+		[1, "", "KEYBOARD", "PAD"],
+		[1, "MOVE", "ARROWS", "DPAD"],
+		[1, "SWORD", "X", "B"],
+		[1, "ITEM ON A", "Z", "A"],
+		[1, "ITEM ON Y", "C", "Y"],
+		[1, "RUN - BOOTS", "S", "RT"],
+		[1, "PAUSE", "ENTER", "START"],
+		[1, "MENU PAGE", "BRACKETS", "LB RB"],
+		[1, "MENU BACK", "X", "B"],
+		[3, "SHIELD: HOLD ITS BUTTON."],
+		[3, "DASH: HOLD RUN AND STEER."],
+		[3, "LET GO TO STOP."],
+		[3, "TALK: FACE THEM AND PRESS A."],
+		[3, "SIGNS AND CHESTS TOO."],
+		[0, "DEBUG KEYS"],
+		[2, "CTRL", "LOSE HALF A HEART"],
+		[2, "H", "HEAL HALF A HEART"],
+		[2, "SHIFT", "USE 4 MAGIC"],
+		[2, "M", "RESTORE 4 MAGIC"],
+		[2, "J", "HEART CONTAINER"],
+		[2, "1", "ADD 10 MONEY"],
+		[2, "2", "ADD A KEY"],
+		[2, "3", "ADD A BOMB"],
+		[2, "4", "ADD 5 ARROWS"],
+		[2, "5", "NEXT BUN PIECE"],
+		[2, "6", "NEXT SWORD TIER"],
+		[2, "7", "NEXT SHIELD TIER"],
+		[2, "8", "NEXT ARMOR TIER"],
+		[2, "G", "GLOVES ON/OFF"],
+		[2, "F", "FLIPPERS ON/OFF"],
+		[2, "R", "BOOTS ON/OFF"],
+		[2, "0", "EVERY ITEM"],
+		[2, "B", "ALL 5 BOTTLES"],
+		[2, "K", "BIGGER BOMB BAG"],
+		[2, "L", "BIGGER QUIVER"],
+		[2, "9", "TEST DUNGEON"],
+		[2, "O", "OVERWORLD"],
+		[2, "I", "ITEM TEST ROOM"],
+		[2, "U", "DEBUG ROOM"]
+	];
 
 
 }

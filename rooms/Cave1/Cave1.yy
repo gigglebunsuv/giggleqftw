@@ -18,7 +18,7 @@
 34,35,33,21,27,27,-5,21,-4,27,4,15,34,35,15,-5,21,-3,27,-4,21,8,27,34,35,33,21,21,27,27,-4,21,
 -5,27,7,34,35,21,33,33,21,36,-3,21,13,27,36,21,21,27,27,34,35,33,21,21,27,27,-3,21,-3,27,8,33,
 22,40,17,16,40,23,33,-8,21,-2,27,3,33,34,35,-3,33,6,21,27,36,21,21,36,-3,33,1,34,-4,9,1,35,
--4,21,-5,33,5,27,33,33,34,16,-6,40,2,4,5,-4,40,1,17,-4,9,1,16,-12,40,1,17,],"TileDataFormat":1,},"tilesetId":{"name":"tileset6","path":"tilesets/tileset6/tileset6.yy",},"userdefinedDepth":false,"visible":true,"x":0,"y":0,},
+-4,21,-5,33,5,27,33,33,34,16,-6,40,2,4,5,-4,40,1,17,-4,9,1,16,-12,40,1,17,],"TileDataFormat":1,},"tilesetId":{"name":"tile_caves","path":"tilesets/tile_caves/tile_caves.yy",},"userdefinedDepth":false,"visible":true,"x":0,"y":0,},
     {"resourceType":"GMRInstanceLayer","resourceVersion":"1.0","name":"Instances","depth":100,"effectEnabled":true,"effectType":null,"gridX":32,"gridY":32,"hierarchyFrozen":false,"inheritLayerDepth":false,"inheritLayerSettings":false,"inheritSubLayers":true,"inheritVisibility":true,"instances":[],"layers":[],"properties":[],"userdefinedDepth":false,"visible":true,},
     {"resourceType":"GMRBackgroundLayer","resourceVersion":"1.0","name":"Background","animationFPS":15.0,"animationSpeedType":0,"colour":4278190080,"depth":200,"effectEnabled":true,"effectType":null,"gridX":32,"gridY":32,"hierarchyFrozen":false,"hspeed":0.0,"htiled":false,"inheritLayerDepth":false,"inheritLayerSettings":false,"inheritSubLayers":true,"inheritVisibility":true,"layers":[],"properties":[],"spriteId":null,"stretch":false,"userdefinedAnimFPS":false,"userdefinedDepth":false,"visible":true,"vspeed":0.0,"vtiled":false,"x":0,"y":0,},
   ],

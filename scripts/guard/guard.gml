@@ -9,8 +9,7 @@
 #macro GUARD_ALERT_TIME 24
 #macro GUARD_CHARGE_TIME 70
 #macro GUARD_RECOVER_TIME 40
-#macro GUARD_SWORD_FORWARD 3	//the sword's middle: this far ahead of the guard's middle...
-#macro GUARD_SWORD_SIDE 7		//...and this far out to its right-hand side
+#macro GUARD_GRIP 3				//from the sword's middle back to its grip (spr_guard_sword)
 #macro GUARD_BLADE 3			//the part that hurts: this far past the sword's middle, toward the tip
 #macro GUARD_BLADE_SIZE 4		//half the size of the square that hurts (was 5, further out)
 #macro GUARD_SWORD_DAMAGE 2
@@ -26,10 +25,30 @@ function guard_sees_link() {
 
 }
 
+///guard_hand();
+function guard_hand() {
+	//[x, y] of the guard's sword hand (its gauntlet in spr_guard), from its origin, for the way
+	//it faces: right, up, left, down. Change these if the guard's sprite changes.
+	switch (enemy_dir4(face) div 90) {
+		case 0: return [2, -1];		//facing right: the hand in front of it
+		case 1: return [5, -1];		//facing up: its right hand is on the right of the screen
+		case 2: return [-3, -1];	//facing left
+		default: return [-6, -1];	//facing down: its right hand is on the left of the screen
+	}
+
+
+}
+
 ///guard_sword_x(); guard_sword_y();
-//Where the sword is drawn: a little ahead, out at the guard's right-hand side
-function guard_sword_x() {return x + lengthdir_x(GUARD_SWORD_FORWARD, face) + lengthdir_x(GUARD_SWORD_SIDE, face - 90)}
-function guard_sword_y() {return y + lengthdir_y(GUARD_SWORD_FORWARD, face) + lengthdir_y(GUARD_SWORD_SIDE, face - 90)}
+//Where the sword is drawn (its middle): the grip in the guard's hand, pointing the way it faces
+function guard_sword_x() {
+	var h = guard_hand();
+	return x + h[0] + lengthdir_x(GUARD_GRIP, enemy_dir4(face));
+}
+function guard_sword_y() {
+	var h = guard_hand();
+	return y + h[1] + lengthdir_y(GUARD_GRIP, enemy_dir4(face));
+}
 
 ///guard_sword_check();
 function guard_sword_check() {

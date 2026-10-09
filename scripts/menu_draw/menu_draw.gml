@@ -171,6 +171,8 @@ function menu_map_build() {
 		array_sort(map.rooms, function(a, b) {
 			return (b[2] - b[0]) * (b[3] - b[1]) - (a[2] - a[0]) * (a[3] - a[1]);
 		});
+		//Haven: a picture of the overworld under the zones (made by make_overworld_room.py)
+		if (room == rm_overworld) {map.picture = spr_map_overworld}
 		return map;
 	}
 
@@ -202,6 +204,12 @@ function menu_draw_map(argument0, argument1, argument2, argument3, argument4) {
 	var n = array_length(map.rooms);
 	if (n == 0) return;
 
+	//A picture of the room (Haven): drawn 1:1, with Link's zone outlined over it
+	if (variable_struct_exists(map, "picture")) {
+		menu_draw_map_picture(argument0, argument1, argument2, argument3, map);
+		return;
+	}
+
 	var sc = min((argument2 - 2) / room_width, (argument3 - 2) / room_height);
 	var ox = argument0 + (argument2 - floor(room_width * sc)) div 2;
 	var oy = argument1 + (argument3 - floor(room_height * sc)) div 2;
@@ -220,6 +228,40 @@ function menu_draw_map(argument0, argument1, argument2, argument3, argument4) {
 
 	if (map.link_x >= 0 && (current_time div 250) mod 2 == 0) {
 		menu_draw_rect(ox + floor(map.link_x * sc) - 1, oy + floor(map.link_y * sc) - 1, 3, 3, MENU_COL_CURSOR);
+	}
+
+
+}
+
+///menu_draw_map_picture(x, y, w, h, map);
+function menu_draw_map_picture(argument0, argument1, argument2, argument3, argument4) {
+	//menu_draw_map for a room with a picture: the picture centred in the w x h area at its own
+	//size, a white outline around the zone Link is in, and Link as a blinking dot.
+	var map = argument4;
+	var pw = sprite_get_width(map.picture);
+	var ph = sprite_get_height(map.picture);
+	var ox = argument0 + (argument2 - pw) div 2;
+	var oy = argument1 + (argument3 - ph) div 2;
+	var sx = pw / room_width;
+	var sy = ph / room_height;
+	menu_draw_rect(ox - 1, oy - 1, pw + 2, ph + 2, c_black);
+	draw_sprite(map.picture, 0, ox, oy);
+
+	for (var i = 0; i < array_length(map.rooms); i++) {
+		var r = map.rooms[i];
+		if (!r[4]) continue;
+		var rx = ox + floor(r[0] * sx);
+		var ry = oy + floor(r[1] * sy);
+		var rw = max(1, ox + floor(r[2] * sx) - rx);
+		var rh = max(1, oy + floor(r[3] * sy) - ry);
+		menu_draw_frame(rx, ry, rw, rh, 1, c_white);
+	}
+
+	if (map.link_x >= 0 && (current_time div 250) mod 2 == 0) {
+		var lx = ox + floor(map.link_x * sx);
+		var ly = oy + floor(map.link_y * sy);
+		menu_draw_rect(lx - 2, ly - 2, 5, 5, c_black);
+		menu_draw_rect(lx - 1, ly - 1, 3, 3, MENU_COL_CURSOR);
 	}
 
 

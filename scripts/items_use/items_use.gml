@@ -394,6 +394,7 @@ function treasure_collect() {
 			case "quiver": player_upgrade_arrows(); break;
 			case "heart": player_add_heart(); break;
 			case "heart_piece": heart_piece_collect(); break;
+			case "ore": global.swordOre += amount; break;
 			case "bun":
 				var piece = 0;
 				while (piece < BUN_PIECES && global.bunPieces[piece]) {piece++}
@@ -425,7 +426,7 @@ function treasure_fanfare() {
 		case "heart": case "heart_piece": return SFX_HEART_CONTAINER;
 		case "bun": return SFX_FANFARE_BUN;
 		case "sword": case "shield": case "armor": case "gloves": case "flippers": case "boots":
-		case "bomb_bag": case "quiver": case "boss_key":
+		case "bomb_bag": case "quiver": case "boss_key": case "ore":
 			return SFX_FANFARE_ITEM;
 	}
 	return SFX_ITEM_GET;
@@ -450,6 +451,7 @@ function treasure_icon() {
 		case "quiver": return [spr_item_bow, 0];
 		case "heart": return [spr_heart_container, 0];
 		case "heart_piece": return [spr_heart_piece, 0];
+		case "ore": return [spr_star_iron, 0];
 		case "bun": return [spr_menu_bun, 1];
 		case "refill": return [spr_pickup, PICKUP.MAGIC];
 		case "money": return [spr_pickup, PICKUP.MONEY20];

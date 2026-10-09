@@ -1,4 +1,4 @@
-/// @description Story crawl and title reveal, then Play or Settings, or replay the intro when left alone
+/// @description Story crawl and title reveal, then Play (the files), Settings or Debug, or replay the intro when left alone
 
 //Window and GUI size, like the rooms with the HUD. obj_hud_main (persistent) sets them up
 //and draws the game in the window (the view is centred here, see hud_play_area_window)
@@ -40,17 +40,23 @@ if (intro < 3) {
 	exit;	//the button that skipped doesn't also pick a choice
 }
 
-//Left alone on the main choices: play the story and reveal again
-//(not on the Options screen, so there's time to read the controls)
+//Left alone on the main choices or the Debug list: play the story and reveal again
+//(not on the Options screen or the files, so there's time to read and type)
 idle_steps += 1;
-if (skip || act_b || menu_move != 0 || menu_move_h != 0 || menu == 2) {idle_steps = 0}
+if (skip || act_b || menu_move != 0 || menu_move_h != 0 || menu >= 2) {idle_steps = 0}
 if (idle_steps >= TITLE_IDLE_TIME * game_get_speed(gamespeed_fps)) {
 	title_intro_start();
 	exit;
 }
 
+//The file select and name entry (file_select script)
+if (menu >= 3) {
+	file_select_step(skip);
+	exit;
+}
+
 switch (menu) {
-	//Play (straight into the overworld, in front of Link's house) or Settings
+	//Play (the save files), Settings, Debug
 	case 0:
 		if (menu_move != 0) {
 			cursor = (cursor + menu_move + array_length(main_choices)) mod array_length(main_choices);
@@ -58,22 +64,47 @@ switch (menu) {
 		}
 		if (skip) {
 			audio_play_sound(menu_select, 3, false);
-			if (cursor == 0) {
-				var c = play_choice;
-				if (!instance_exists(obj_link)) {instance_create_depth(c[2], c[3], 0, obj_link)}
-				obj_link.x = c[2];
-				obj_link.y = c[3];
-				script_execute(c[4]);
-				global.pause_block = true;	//so Link ignores the button that started the game
-				room_goto(c[1]);
-			} else {
-				menu = 2;
-				options_open(opt_rows);
+			switch (cursor) {
+				case 0:
+					file_select_open();
+					break;
+				case 1:
+					menu = 2;
+					options_open(opt_rows);
+					break;
+				case 2:
+					menu = 1;
+					cursor = 0;
+					break;
 			}
 		}
 		break;
 
-	//Options screen: B or its Back goes back, with the cursor on Options
+	//Debug: start anywhere (no save file). B goes back.
+	case 1:
+		if (act_b) {
+			menu = 0;
+			cursor = 2;
+			audio_play_sound(menu_switch, 2, false);
+			break;
+		}
+		var n = array_length(debug_choices);
+		if (menu_move != 0) {
+			cursor = (cursor + menu_move + n) mod n;
+			audio_play_sound(menu_switch, 2, false);
+		}
+		if (skip) {
+			audio_play_sound(menu_select, 3, false);
+			var c = debug_choices[cursor];
+			save_start_link(c[2], c[3]);
+			save_debug_game();
+			if (array_length(c) > 4) {script_execute(c[4])}
+			global.pause_block = true;	//so Link ignores the button that started the game
+			room_goto(c[1]);
+		}
+		break;
+
+	//Options screen: B or its Back goes back, with the cursor on Settings
 	case 2:
 		if (options_step(skip)) {
 			menu = 0;

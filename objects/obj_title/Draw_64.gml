@@ -1,4 +1,4 @@
-/// @description Story crawl, title art and logo, "OVERWORLD DEMO", the choices in the field (or the Options screen), the studio name
+/// @description Story crawl, title art and logo, the choices in the field (or the Options screen, or the files), the studio name
 
 //Fills the whole window (256x208, the same size as the HUD bar + play area in the game).
 //spr_title_bg and spr_title_logo are stretched to it, so draw them at 256x208.
@@ -27,14 +27,6 @@ if (sprite_exists(logo)) {
 }
 if (intro == 2) {exit}
 
-//"OVERWORLD DEMO" under the logo, on a dark band so it reads over the art
-draw_set_font(menu_font);
-draw_set_valign(fa_top);
-draw_set_halign(fa_center);
-draw_sprite_ext(spr_pixel, 0, gw div 2 - 66, TITLE_DEMO_Y - 3, 132, 14, 0, c_black, 0.55);
-menu_draw_text_colour(gw div 2, TITLE_DEMO_Y, "OVERWORLD DEMO", MENU_COL_CURSOR);
-draw_set_halign(fa_left);
-
 //Options screen: a box over the whole window (options_menu script)
 draw_set_font(menu_font);
 draw_set_valign(fa_top);
@@ -43,14 +35,26 @@ if (menu == 2) {
 	exit;
 }
 
-//Choices, in the field to the right of the cliff, on a see-through panel so the rocks
-//behind don't make them hard to read
+//The file select and name entry (file_select script)
+if (menu >= 3) {
+	file_select_draw(gw, gh);
+	exit;
+}
+
+//Choices (main or Debug), in the field to the right of the cliff, on a see-through panel so
+//the rocks behind don't make them hard to read
 var names = main_choices;
+if (menu == 1) {names = debug_names}
 var n = array_length(names);
 var cx = TITLE_MENU_X;
 var top = TITLE_MENU_Y;
 var pw = 120;
 var ph = 14 + n * 12;
+if (menu == 1) {
+	top = TITLE_DEBUG_Y;	//the longer list starts higher
+	pw = 136;
+	ph += 8;	//room for the back hint
+}
 draw_sprite_ext(spr_pixel, 0, cx - pw / 2, top - 4, pw, ph, 0, c_black, 0.45);
 
 for (var i = 0; i < n; i++) {
@@ -60,7 +64,12 @@ for (var i = 0; i < n; i++) {
 //Small text: how to pick (under the choices) and the studio (bottom left)
 draw_set_font(small_font);
 var hint = "UP/DOWN AND ENTER";
-if (global.input_using_pad) {hint = "DPAD AND A"}
+var back = "X: BACK";
+if (global.input_using_pad) {
+	hint = "DPAD AND A";
+	back = "B: BACK";
+}
 menu_draw_text_colour(cx, top + n * 12 + 1, hint, c_ltgray);
+if (menu == 1) {menu_draw_text_colour(cx, top + n * 12 + 9, back, c_ltgray)}
 draw_set_halign(fa_left);
 menu_draw_text(3, gh - 9, "UNKNOWN VENGEANCE STUDIOS");

@@ -7,6 +7,7 @@ map = menu_map_build();
 instance_deactivate_all(true);
 
 menu_font = font_add_sprite_ext(spr_menu_font, " ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-:!?.'/", false, 0);
+small_font = font_add_sprite_ext(spr_font_small, " ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-:!?.'/", false, 0);	//Star Iron count on the quest page
 
 //Skip input on the first step: the button that opened the menu still counts as pressed
 opened = false;
@@ -22,8 +23,10 @@ grid = item_grid();	//which item is in each slot
 cursor = max(0, item_grid_slot(global.itemA));	//start on the equipped item
 
 //Settings page
-set_choices = ["RESUME", "OPTIONS", "MAIN MENU"];
+set_choices = ["RESUME", "SAVE AND CONTINUE", "SAVE AND QUIT", "OPTIONS", "MAIN MENU"];
 set_cursor = 0;
+save_msg = "";		//"SAVED" (or "NO SAVE FILE") under the choices for a moment
+save_msg_timer = 0;
 confirm_quit = false;	//pressed A once on Main menu: press again to go to the title
 show_options = false;	//showing the Options screen (controls, volume: see the options_menu script)
 

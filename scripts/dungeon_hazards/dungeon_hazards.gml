@@ -10,7 +10,7 @@
 ///pot_break();
 function pot_break() {
 	//Run by obj_pot when the sword hits it: it smashes, maybe leaving something behind
-	//(drop = a PICKUP, -1 = random, -2 = nothing)
+	//(drop = a PICKUP, -1 = random, -2 = nothing, -3 = a few arrows once Link has the bow)
 	var cx = x + 8;
 	var cy = y + 8;
 	rock_break(cx, cy);
@@ -22,8 +22,11 @@ function pot_break() {
 		else if (roll == 3) {d = PICKUP.MAGIC}
 		else if (roll <= 5) {d = PICKUP.MONEY1}
 		else if (roll == 6) {d = PICKUP.MONEY5}
+		else if (roll == 7 && global.item_have[ITEM.BOW]) {d = -3}	//so arrows never run out for good
 		else {d = -2}
 	}
+	if (d == -3 && !global.item_have[ITEM.BOW]) {d = -2}
+	if (d == -3) {instance_create_depth(cx, cy, DEPTH_DECOR, obj_arrow_bundle)}
 	if (d >= 0) {pickup_create(d, cx, cy)}
 	instance_destroy();
 

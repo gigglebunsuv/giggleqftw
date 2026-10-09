@@ -20,7 +20,7 @@ if (!want_open && is_open) {
 	if (instance_exists(block)) {with (block) {instance_destroy()}}
 	block = noone;
 	sfx_play(SFX_SHUTTER);
-	if (open_when == "torches" || open_when == "switch") {
+	if (open_when == "torches" || open_when == "switch" || open_when == "eye") {
 		sfx_play(SFX_SECRET);
 		flag_set(door_flag(), true);
 		open_when = "";

@@ -18,6 +18,11 @@ if (level_room_uses_levels()) {
 
 //The grapple hook doesn't come along to the new room, and a jump or fall is over
 if (state == "hook" || state == "pull" || state == "jump" || state == "fall" || state == "land" || state == "hop") {state = "idle"}
+//Nor a text box or an item held up (they stay behind in the old room): don't stay frozen waiting for them
+if ((state == "itemget" || state == "talk") && !instance_exists(obj_dialogue) && !instance_exists(obj_item_get)) {
+	state = "idle";
+	pose = -1;
+}
 z = 0;
 image_xscale = 1;
 image_yscale = 1;

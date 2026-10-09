@@ -70,7 +70,9 @@ function dlg_village_guard() {
 	return [
 		dlg_if("got_first_sword", [
 			"THE ROAD NORTH CROSSES THE RIVER TO OLD CASTLE TOWN.",
-			"THE SAPPHIRE ORDER HOLDS IT NOW. THEIR SOLDIERS CHARGE THE MOMENT THEY SEE YOU. KEEP YOUR SHIELD UP!"
+			"THE SAPPHIRE ORDER HOLDS IT NOW. THEIR SOLDIERS CHARGE THE MOMENT THEY SEE YOU. KEEP YOUR SHIELD UP!",
+			"AND IF THAT OLD SWORD FEELS DULL, SEE THE SMITH BY THE MARKET. GIVE HIM STAR IRON AND HE'LL MAKE IT SING.",
+			"THEY SAY THE BEASTS GUARDING THE TOWERS CARRY IT."
 		], [
 			"SIR GIGGLEBUNS! YOU CAN'T GO OUT THERE EMPTY-HANDED. SLIMES IN THE FIELDS, WOLVES IN THE FOREST...",
 			"TAKE MY OLD SWORD AND SHIELD. THEY'VE SEEN BETTER DAYS, BUT THEY'LL KEEP YOU SAFE.",
@@ -199,27 +201,8 @@ function dlg_desert_traveller() {
 
 //================================================================ the forest, the marsh, the cliffs
 
-///dlg_woodcutter();
-function dlg_woodcutter() {
-	return [
-		"THESE WOODS GO ON FOREVER. OR THEY FEEL LIKE THEY DO.",
-		"THE OLD PATH NORTH-EAST ENDS AT A GATE OF LIGHT. ONLY ONE WHO CARRIES THE WHOLE BUN CAN WALK THROUGH IT.",
-		"AND THE BUSHES WEST OF HERE HIDE A LITTLE GROVE. MY GRANDPA SAID SOMETHING PRECIOUS SITS IN THERE."
-	];
+//(the woodcutter and the fisherman are in the trade_quest script: they're part of the hammer's trading chain)
 
-
-}
-
-///dlg_fisherman();
-function dlg_fisherman() {
-	return [
-		"SHH! YOU'LL SCARE THE FISH.",
-		"SEE THE LITTLE ISLAND OUT IN THE LAKE? SOMETHING SHINY SITS ON IT. IF ONLY I COULD SWIM.",
-		"THE BOG TOWER? NOBODY GETS IN THERE. YOU'D HAVE TO SWIM OUT, THEN SOMEHOW FLY OVER THE BOG."
-	];
-
-
-}
 
 ///dlg_cliff_hermit();
 function dlg_cliff_hermit() {

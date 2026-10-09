@@ -15,3 +15,5 @@ boomerang_kills = false;	//true: the boomerang kills it instead
 invulnerable = false;	//true: sword, arrows and bombs just clink off (see enemy_hurt)
 clink_timer = 0;
 can_touch = true;		//false: high in the air, Link and his sword pass underneath
+arrow_weak = false;		//true: arrows hurt it even while it's invulnerable (a boss's open weak point)
+ignore_clear = false;	//true: "clear" shutter doors don't wait for it (things that can't be beaten)

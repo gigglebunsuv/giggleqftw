@@ -11,13 +11,17 @@
 //dungeon's keys, swapped in and out by dungeon_room_start. Dungeon 0 = not in a dungeon.
 //Doors: obj_locked_door (small key), obj_boss_door (boss key), obj_shutter_door (opens by itself).
 
-#macro DUNGEON_COUNT 4			//0 = outside, 1 = the Southern Tower, 2-3 for later
+#macro DUNGEON_COUNT 4			//0 = outside, 1 = the Southern Tower, 2 the Bog Tower, 3 the Tower of Ladhellin
 #macro FLOOR_FADE_TIME 12		//steps to fade out (and back in) on the stairs between floors
 #macro FLOOR_NAME_TIME 90		//steps the floor's name ("2F") shows after changing floors
 #macro DROP_HEIGHT 48			//pixels Link falls from after dropping through a hole
 #macro DROP_TIME 14				//steps that takes
 #macro TOWER_START_X 1792		//the Southern Tower's entrance (1F, the entrance hall's front door)
 #macro TOWER_START_Y 680
+#macro BOG_START_X 3072		//the Bog Tower's entrance (1F, inside the front door; printed by make_bog_room.py)
+#macro BOG_START_Y 680
+#macro LADHELLIN_START_X 1792	//the Tower of Ladhellin's entrance (1F, inside the front door; printed by make_ladhellin_room.py)
+#macro LADHELLIN_START_Y 680
 #macro THANKS_DELAY 40			//dungeon demo: steps after the Bun's text box closes before the thank-you screen
 #macro THANKS_WAIT 90			//steps on the thank-you screen before a button goes back to the title
 #macro THANKS_FADE 30			//steps to fade the thank-you screen in and out
@@ -40,6 +44,8 @@ function dungeon_init() {
 function dungeon_of_room(argument0) {
 	//Which dungeon a room is (0 = not a dungeon)
 	if (argument0 == rm_southern_tower) return 1;
+	if (argument0 == rm_bog_tower) return 2;
+	if (argument0 == rm_ladhellin_tower) return 3;
 	return 0;
 
 
@@ -49,8 +55,24 @@ function dungeon_of_room(argument0) {
 function dungeon_name(argument0) {
 	switch (argument0) {
 		case 1: return "SOUTHERN TOWER";
+		case 2: return "BOG TOWER";
+		case 3: return "TOWER OF LADHELLIN";
 	}
 	return "";
+
+
+}
+
+///dungeon_entrance(dungeon);
+function dungeon_entrance(argument0) {
+	//[room, x, y]: where Link stands just inside a dungeon's front door (loading a save made
+	//inside it starts him here). [noone, 0, 0] for a number that isn't a dungeon.
+	switch (argument0) {
+		case 1: return [rm_southern_tower, TOWER_START_X, TOWER_START_Y];
+		case 2: return [rm_bog_tower, BOG_START_X, BOG_START_Y];
+		case 3: return [rm_ladhellin_tower, LADHELLIN_START_X, LADHELLIN_START_Y];
+	}
+	return [noone, 0, 0];
 
 
 }
@@ -322,7 +344,7 @@ function zone_enemies_left(argument0) {
 	var z = argument0;
 	var n = 0;
 	with (obj_enemy) {
-		if (point_in_rectangle(x, y, z.bbox_left, z.bbox_top, z.bbox_right, z.bbox_bottom)) {n++}
+		if (!ignore_clear && point_in_rectangle(x, y, z.bbox_left, z.bbox_top, z.bbox_right, z.bbox_bottom)) {n++}
 	}
 	return n;
 
@@ -370,6 +392,12 @@ function shutter_should_open() {
 				if (zones[i] == lz && zone_enemies_left(lz) > 0) return false;
 			}
 			return true;
+		case "eye":
+			//Every stone eye in one of its rooms shot with an arrow (see the bog script)
+			for (var i = 0; i < array_length(zones); i++) {
+				if (zone_eyes_shut(zones[i])) return true;
+			}
+			return false;
 		case "torches":
 			for (var i = 0; i < array_length(zones); i++) {
 				if (zone_torches_lit(zones[i])) return true;
@@ -410,7 +438,7 @@ function boss_music_step() {
 	//is alive. Leaving before it wakes up brings the dungeon's music back; beating it stops the
 	//theme, and the dungeon's music comes back once the explosions are over.
 	var zone = cam_zone_at(x, y);
-	var boss_alive = instance_exists(obj_gargoyle) && !flag_get(boss_flag(global.dungeon));
+	var boss_alive = instance_exists(boss_object) && !flag_get(boss_flag(global.dungeon));
 	var fighting = boss_alive && zone != noone && global.cam_zone == zone;
 
 	if (fighting && !music_on) {
@@ -432,22 +460,30 @@ function boss_music_step() {
 
 ///boss_rewards_spawn();
 function boss_rewards_spawn() {
-	//Run by obj_boss_arena once the boss is beaten: the heart container and the piece of
-	//the Bun, each held up over Link's head when he walks onto it (the ones not picked up yet)
+	//Run by obj_boss_arena once the boss is beaten (around its reward_x, reward_y): the heart container and the piece of
+	//the Bun, each held up over Link's head when he walks onto it (the ones not picked up yet).
+	//The bosses of the first dungeons (up to SMITH_DUNGEONS) also leave a lump of Star Iron for the smith.
 	var d = global.dungeon;
 	if (!flag_get(boss_reward_flag(d, "heart"))) {
-		var h = instance_create_depth(x - 8, y + 8, DEPTH_DECOR, obj_treasure);
+		var h = instance_create_depth(reward_x - 8, reward_y + 8, DEPTH_DECOR, obj_treasure);
 		h.equip = "heart";
 		h.hold_up = true;
 		h.pedestal = false;
 		h.flag = boss_reward_flag(d, "heart");
 	}
+	if (d >= 1 && d <= SMITH_DUNGEONS && !flag_get(boss_reward_flag(d, "ore"))) {
+		var o = instance_create_depth(reward_x + 16, reward_y + 8, DEPTH_DECOR, obj_treasure);
+		o.equip = "ore";
+		o.hold_up = true;
+		o.pedestal = false;
+		o.flag = boss_reward_flag(d, "ore");
+	}
 	if (!flag_get(boss_reward_flag(d, "bun"))) {
-		var b = instance_create_depth(x - 8, y - 32, DEPTH_DECOR, obj_treasure);
+		var b = instance_create_depth(reward_x - 8, reward_y - 32, DEPTH_DECOR, obj_treasure);
 		b.equip = "bun";
 		b.hold_up = true;
 		b.flag = boss_reward_flag(d, "bun");
-		b.message = "THE BUN GLOWS WARMLY. THE SOUTHERN TOWER IS FREE!";
+		b.message = "THE BUN GLOWS WARMLY. THE " + dungeon_name(d) + " IS FREE!";
 	}
 	sfx_play(SFX_ITEM_GET);
 
@@ -470,6 +506,60 @@ function dungeon_start_southern_tower() {
 	global.pBombs = 0;
 	shield_set_tier(1);
 	item_give(ITEM.LANTERN);
+
+
+}
+
+///dungeon_start_bog_tower();
+function dungeon_start_bog_tower() {
+	//Level select: Link starts at the Bog Tower's entrance with what he'd have after the Southern
+	//Tower: 4 hearts, the level 2 sword, the wooden shield, the tunic, the lantern, the grapple hook,
+	//the boomerang, the flippers and the boots (no bow or strength gloves: they're in here)
+	global.pHealthMax = 8;
+	global.pHealth = 8;
+	global.pMagic = global.pMagicMax;
+	global.pMoney = 100;
+	global.swordTier = 2;
+	global.armorTier = 1;
+	for (var i = 0; i < ITEM.COUNT; i++) {item_take(i)}
+	global.pArrows = 0;
+	global.pBombs = 0;
+	shield_set_tier(1);
+	item_give(ITEM.LANTERN);
+	item_give(ITEM.GRAPPLE);
+	item_give(ITEM.BOOMERANG);
+	global.hasFlippers = true;
+	global.hasGloves = false;
+	global.hasBoots = true;
+
+
+}
+
+///dungeon_start_ladhellin();
+function dungeon_start_ladhellin() {
+	//Level select: Link starts at the Tower of Ladhellin's entrance with what he'd have after the
+	//Bog Tower and the hammer's trading chain: 5 hearts, the level 3 sword, the wooden shield,
+	//level 2 armor, the lantern, grapple hook, boomerang, bow, hammer, flippers, gloves and boots
+	//(no cape or Sun Lens: they're in here)
+	global.pHealthMax = 10;
+	global.pHealth = 10;
+	global.pMagic = global.pMagicMax;
+	global.pMoney = 200;
+	global.swordTier = 3;
+	global.armorTier = 2;
+	for (var i = 0; i < ITEM.COUNT; i++) {item_take(i)}
+	global.pBombs = 0;
+	shield_set_tier(1);
+	item_give(ITEM.LANTERN);
+	item_give(ITEM.GRAPPLE);
+	item_give(ITEM.BOW);
+	item_give(ITEM.HAMMER);
+	item_give(ITEM.BOOMERANG);
+	global.pArrows = global.pArrowsMax;
+	global.hasFlippers = true;
+	global.hasGloves = true;
+	global.hasBoots = true;
+	flag_set(TRADE_FLAG, TRADE_DONE);
 
 
 }

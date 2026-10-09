@@ -1,0 +1,1 @@
+dialogue = "THE SUN STAIR. TRUST THE LENS, NOT YOUR EYES.";

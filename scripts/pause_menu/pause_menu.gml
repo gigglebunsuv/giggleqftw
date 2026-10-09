@@ -3,7 +3,8 @@
 //	0 ITEMS		the item grid (put items on A or Y), the buttons, preassigned equipment (sword, boots)
 //	1 QUEST		passive equipment (gloves, armor, flippers), The Bun, the map of this room
 //				(in a dungeon: one floor at a time, up/down for the others, see the dungeon_map script)
-//	2 SETTINGS	resume, options (the controls list, the volume: options_menu script), back to the title screen
+//	2 SETTINGS	resume, save (save_files script), options (the controls list, the volume: options_menu script),
+//				back to the title screen
 //The screen covers the whole window (the HUD bar too). GUI is 256x208.
 
 #macro PAUSE_PAGES 3
@@ -59,7 +60,9 @@ function pause_step_settings() {
 		return;
 	}
 
-	//Resume, Options, Main menu (A twice: starts the whole game again from the title)
+	//Resume, Save and continue, Save and quit (to the title), Options, Main menu
+	//(A twice: starts the whole game again from the title, without saving)
+	if (save_msg_timer > 0) {save_msg_timer--}
 	if (menu_move != 0) {
 		set_cursor = (set_cursor + menu_move + array_length(set_choices)) mod array_length(set_choices);
 		confirm_quit = false;
@@ -71,11 +74,28 @@ function pause_step_settings() {
 			pause_close();
 			break;
 		case 1:
+		case 2:
+			//Save to this game's file (save_files script). Games from the DEBUG menu have none.
+			confirm_quit = false;
+			save_msg_timer = 60;
+			if (!save_current_game()) {
+				save_msg = "NO SAVE FILE";
+				audio_play_sound(snd_bonk, 2, false);
+				break;
+			}
+			save_msg = "SAVED";
+			audio_play_sound(menu_select, 3, false);
+			if (set_cursor == 2) {
+				instance_activate_all();
+				game_restart();	//the title screen is the first room
+			}
+			break;
+		case 3:
 			show_options = true;
 			options_open((page_h - 40) div 10);
 			audio_play_sound(menu_select, 3, false);
 			break;
-		case 2:
+		case 4:
 			if (confirm_quit) {
 				audio_play_sound(menu_select, 3, false);
 				instance_activate_all();
@@ -241,6 +261,17 @@ function pause_draw_quest() {
 		if (global.bunPieces[i]) {frame = i + 1}
 		draw_sprite(spr_menu_bun, frame, bun_x + i * (16 + bun_gap), page_y + 18);
 	}
+	//Star Iron for the smith (in the box's corner, once Link has had any)
+	if (smith_ore_seen()) {
+		var ore_x = bun_box_x + half_w - 22;
+		draw_sprite(spr_star_iron, 0, ore_x, page_y + 17);
+		draw_set_font(small_font);
+		menu_draw_text(ore_x + 11, page_y + 28, string(global.swordOre));
+		draw_set_font(menu_font);
+	}
+	//The hammer's trading chain: what Link is carrying to trade (in the other corner, see the trade_quest script)
+	var trade = trade_at();
+	if (trade >= TRADE_FISH && trade < TRADE_DONE) {draw_sprite(spr_trade_item, trade - 1, bun_box_x + 6, page_y + 17)}
 
 	//--- Map of this room (taken when the menu opened, see menu_map_build)
 	var map_y = page_y + 44;
@@ -284,6 +315,13 @@ function pause_draw_settings() {
 		menu_draw_choice(gw div 2, top + j * 16, set_choices[j], j == set_cursor);
 	}
 	draw_set_halign(fa_left);
+
+	//Saved (or there's no file to save to)
+	if (save_msg_timer > 0 && !confirm_quit) {
+		draw_set_halign(fa_center);
+		menu_draw_text_colour(gw div 2, top + n * 16 + 8, save_msg, MENU_COL_CURSOR);
+		draw_set_halign(fa_left);
+	}
 
 	//Main menu needs A twice (unsaved progress is lost)
 	if (confirm_quit) {

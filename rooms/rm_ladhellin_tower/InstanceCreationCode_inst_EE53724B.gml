@@ -1,0 +1,1 @@
+dialogue = "TWO STONE EYES GUARD THE CAPE. CLOSE THEM.";

@@ -4,6 +4,7 @@
 //	"clear"		shuts behind Link while enemies are left in the room he's in, opens when they're gone
 //	"torches"	opens once every torch in one of its rooms is lit (stays open)
 //	"switch"	opens once a floor switch in one of its rooms is stepped on (stays open)
+//	"eye"		opens once every stone eye (obj_eye_switch) in one of its rooms is shot (stays open)
 //Its wall is a separate obj_wall (block) that's only there while it's shut.
 
 open_when = "clear";

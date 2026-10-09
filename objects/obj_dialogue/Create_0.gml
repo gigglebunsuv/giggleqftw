@@ -22,6 +22,15 @@ page_len = 0;
 choices = [];	//answers, when this text ends in a choice box
 cursor = 0;
 
+//A shop's counter (see the shop script): open, which shop, what's on the shelf, the one picked,
+//and -1 or the YES / NO being asked
+small_font = font_add_sprite_ext(spr_font_small, " ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-:!?.'/", false, 0);
+shop_on = false;
+shop_name = "";
+shop_list = [];
+shop_cursor = 0;
+shop_confirm = -1;
+
 //Box at the bottom of the screen, or at the top when Link is in the bottom part
 box_top = false;
 if (instance_exists(obj_link) && view_enabled) {

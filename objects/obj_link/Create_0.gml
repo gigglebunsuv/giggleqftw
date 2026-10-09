@@ -46,6 +46,7 @@ item_give(ITEM.FLUTE);	//Link starts with the flute
 //Equipment tiers (0 = none). The sword is always on B.
 global.swordTier = 1;
 global.armorTier = 1;
+global.swordOre = 0;	//Star Iron from the towers' bosses, not yet forged into the sword (see the smith script)
 
 //Equipment you have or don't
 global.hasBoots = false;	//preassigned
@@ -97,8 +98,14 @@ hspd = 0;
 vspd = 0;
 
 //Pits (see player_pit_check): steps over the edge, steps falling, last safe spot
+//(fall_no_drop: going under in quicksand never drops him to the floor below)
 fall_grace = 0;
 fall_t = 0;
+fall_no_drop = false;
+
+//Quicksand (see player_quicksand_check): wading in it, and steps spent sinking
+in_sand = false;
+sink_t = 0;
 safe_x = x;
 safe_y = y;
 safe_level = 0;

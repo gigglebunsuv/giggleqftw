@@ -1,4 +1,4 @@
-/// @description Spin, fade, then CONTINUE or QUIT
+/// @description Spin, fade, then CONTINUE, SAVE AND QUIT or QUIT
 
 timer++;
 
@@ -20,12 +20,13 @@ if (phase == "spin") {
 } else {
 	input_get();
 	if (menu_move != 0) {
-		cursor = (cursor + menu_move + 2) mod 2;
+		cursor = (cursor + menu_move + array_length(choices)) mod array_length(choices);
 		audio_play_sound(menu_switch, 2, false);
 	}
 	if (act_a || act_start || pad_accept) {
 		audio_play_sound(menu_select, 3, false);
-		if (cursor == 0) {
+		var pick = choices[cursor];
+		if (pick == "CONTINUE") {
 			//CONTINUE: restart this room from where Link came in, with a few hearts
 			global.pHealth = min(continue_hearts * 2, global.pHealthMax);
 			with (obj_link) {
@@ -40,7 +41,11 @@ if (phase == "spin") {
 			instance_activate_all();
 			room_restart();
 		} else {
+			//SAVE AND QUIT: save to this game's file first (save_files script). Loading it gives
+			//Link SAVE_LOAD_HEARTS hearts back.
+			if (pick == "SAVE AND QUIT") {save_current_game()}
 			//QUIT: start the whole game again
+			instance_activate_all();
 			game_restart();
 		}
 	}

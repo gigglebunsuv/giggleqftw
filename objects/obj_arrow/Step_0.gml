@@ -7,7 +7,14 @@ if (level_wall_at(x, y, level)) {
 
 var hit = instance_place(x, y, obj_enemy);
 if (hit != noone && (hit.level == -1 || hit.level == level)) {
-	enemy_hurt(hit, 2, x, y);
+	//An open weak point (arrow_weak) takes arrows even through armour
+	if (hit.arrow_weak && hit.invulnerable) {
+		hit.invulnerable = false;
+		enemy_hurt(hit, 2, x, y);
+		if (instance_exists(hit)) {hit.invulnerable = true}
+	} else {
+		enemy_hurt(hit, 2, x, y);
+	}
 	instance_destroy();
 	exit;
 }

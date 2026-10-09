@@ -109,7 +109,9 @@ function chest_item_name() {
 	if (item != ITEM.NONE) {return item_get_name(item)}
 	switch (equip) {
 		case "bottle": return bottle_get_name(contents);
-		case "sword": return "LEVEL " + string(clamp(tier, 1, SWORD_TIER_MAX)) + " SWORD";
+		case "sword":
+			if (tier >= SWORD_TIER_BUN) return "SWORD OF BUN";	//the gold one, after the third tower
+			return "LEVEL " + string(clamp(tier, 1, SWORD_TIER_MAX)) + " SWORD";
 		case "shield": return item_get_name(ITEM.SHIELD);
 		case "armor": return "LEVEL " + string(clamp(tier, 1, ARMOR_TIER_MAX)) + " ARMOR";
 		case "gloves": return "STRENGTH GLOVES";
@@ -119,6 +121,7 @@ function chest_item_name() {
 		case "quiver": return "BIGGER QUIVER";
 		case "heart": return "HEART CONTAINER";
 		case "heart_piece": return "PIECE OF HEART";
+		case "ore": return "STAR IRON";
 		case "bun": return "PIECE OF THE BUN";
 		case "refill": return "FULL REFILL";
 		case "money": return string(amount) + " MONEY";
@@ -151,6 +154,7 @@ function chest_item_desc() {
 		case ITEM.SHOVEL: return "DIG THE GROUND IN FRONT OF YOU. SOMETHING MIGHT BE BURIED!";
 		case ITEM.CAPE: return "PRESS ITS BUTTON TO JUMP OVER A ONE TILE PIT.";
 		case ITEM.MIRROR: return "TAKES YOU BACK TO WHERE YOU CAME INTO THIS AREA.";
+		case ITEM.LENS: return "HOLD ITS BUTTON TO SEE THROUGH MIRAGES: HIDDEN PATHS, FALSE FLOORS AND WALLS. USES MAGIC.";
 	}
 	switch (equip) {
 		case "bottle": return "DRINK IT WHEN YOU NEED IT. PUT IT ON A OR Y IN THE PAUSE MENU.";
@@ -164,6 +168,7 @@ function chest_item_desc() {
 		case "quiver": return "YOU CAN CARRY MORE ARROWS NOW.";
 		case "heart": return "YOUR LIFE WENT UP BY ONE HEART!";
 		case "heart_piece": return heart_piece_desc();
+		case "ore": return "A LUMP OF IRON THAT FELL FROM THE STARS. THE SMITH IN HAVEN VILLAGE CAN FORGE IT INTO YOUR SWORD.";
 		case "bun": return "FIND EVERY PIECE TO OPEN THE WAY TO THE HIDDEN FOREST.";
 		case "refill": return "HEALTH, MAGIC, BOMBS AND ARROWS ARE ALL FULL AGAIN.";
 		case "money": return "SPEND IT IN SHOPS.";

@@ -5,6 +5,7 @@
 //	obj_wall		blocks every level (obj_dungeon_wall is a visible child)
 //	obj_water		deep water: Link needs the flippers, walking enemies can't go in
 //	obj_pit			a hole: Link falls in (the cape jumps over it), walking enemies can't go in
+//	obj_quicksand	slows Link down and swallows him if he stays (see the ladhellin script)
 //	obj_wall_low	blocks only the lower level (obj_ledge is a visible child: a cliff from below)
 //	obj_wall_high	blocks only the upper level (railings on ledges and bridges)
 //	obj_wall_top	blocks only the third level (its railings)
@@ -205,6 +206,10 @@ function collision_tiles_make() {
 	layer_tiles_to_instances(WALL_LOW_LAYER, obj_wall_low);
 	layer_tiles_to_instances(WALL_HIGH_LAYER, obj_wall_high);
 	layer_tiles_to_instances(WALL_TOP_LAYER, obj_wall_top);
+	layer_tiles_to_instances(QUICKSAND_LAYER, obj_quicksand);
+
+	//The Sun Lens's mirage layers start out showing the mirages (see the sun_lens script)
+	lens_layers_set(false);
 
 	//Holes painted with real tiles: no placeholder drawing for those
 	var made = layer_tiles_to_instances(PIT_ART_LAYER, obj_pit);

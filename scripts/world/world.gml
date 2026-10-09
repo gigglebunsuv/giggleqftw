@@ -10,6 +10,10 @@
 #macro WORLD_START_Y 1450
 #macro WORLD_TOWER_X 912			//in front of the Southern Tower's door (rm_overworld)
 #macro WORLD_TOWER_Y 2314
+#macro WORLD_BOG_X 176				//on the Bog Tower's porch, in front of its door (rm_overworld)
+#macro WORLD_BOG_Y 1194
+#macro WORLD_LADHELLIN_X 3152		//in front of the Tower of Ladhellin's door, below its pegs (rm_overworld)
+#macro WORLD_LADHELLIN_Y 1416
 #macro WORLD_WAKE_MARGIN 48			//overworld enemies move while they're this close to the screen
 #macro WORLD_GATE_TORCH_RANGE 48	//a "torches" gate opens once every torch this close to it is lit
 #macro HEART_PIECES_PER_HEART 1		//pieces of heart that make a new heart (set to 4 for quarter pieces)
@@ -27,6 +31,7 @@ function world_start_new_game() {
 	global.pMagic = global.pMagicMax;
 	global.pMoney = 0;
 	global.swordTier = 0;
+	global.swordOre = 0;
 	global.armorTier = 1;
 	for (var i = 0; i < ITEM.COUNT; i++) {item_take(i)}
 	global.pArrows = 0;
@@ -73,7 +78,7 @@ function world_music_play(argument0) {
 	if (argument0 == -1) return;
 	if (variable_global_exists("world_music") && global.world_music == argument0 && audio_is_playing(argument0)) return;
 	//Stop the other music (not the sound effects)
-	var tracks = [Overworld, Village, DungeonOne, BossTheme, House, Intro, Title];
+	var tracks = [Overworld, Village, DungeonOne, BogTower, LadhellinTower, BossTheme, House, Intro, Title, FileSelect];
 	for (var i = 0; i < array_length(tracks); i++) {audio_stop_sound(tracks[i])}
 	audio_play_sound(argument0, 1, true);
 	global.world_music = argument0;

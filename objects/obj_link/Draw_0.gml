@@ -11,9 +11,14 @@ if (z > 0) {
 var rock_behind = (carrying && state == "lift" && dir == "up");
 if (rock_behind) {draw_sprite(spr_heavy_rock, 0, x - 8, y - 12)}
 
+var sunk = player_quicksand_depth();
 if (swimming) {
 	draw_sprite_part_ext(sprite_index, image_index, 0, 0, sprite_width, 9, x - sprite_xoffset, y - sprite_yoffset, image_xscale, image_yscale, c_white, image_alpha);
 	draw_sprite_ext(spr_pixel, 0, x - 7, y + 1, 14, 1, 0, c_white, 0.8);
+} else if (sunk > 0) {
+	//Sinking in quicksand: his feet (then more) are under the sand
+	draw_sprite_part_ext(sprite_index, image_index, 0, 0, sprite_width, sprite_height - sunk, x - sprite_xoffset, y - sprite_yoffset, image_xscale, image_yscale, c_white, image_alpha);
+	draw_sprite_ext(spr_pixel, 0, x - 7, y + 8 - sunk, 14, 1, 0, make_colour_rgb(200, 145, 62), 0.9);
 } else {
 	draw_sprite_ext(sprite_index, image_index, x, y + dy, image_xscale, image_yscale, 0, c_white, image_alpha);
 }

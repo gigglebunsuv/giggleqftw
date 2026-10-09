@@ -10,7 +10,7 @@
 #macro TITLE_SLIDE_FROM -64		//where the logo starts, above its place (it spans y 9 to 62)
 #macro TITLE_MENU_X 172			//middle of the title choices (in the field right of the cliff)
 #macro TITLE_MENU_Y 128			//top of the title choices
-#macro TITLE_DEMO_Y 68			//"OVERWORLD DEMO", under the logo
+#macro TITLE_DEBUG_Y 76			//top of the Debug list (7 places: starts higher than the main choices)
 #macro TITLE_IDLE_TIME 30		//seconds on the menu with no button pressed before the intro plays again
 
 ///title_intro_start();

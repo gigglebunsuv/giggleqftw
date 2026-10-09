@@ -59,6 +59,13 @@
 #macro SFX_WARP "snd_warp"	//stepping into a warp
 #macro SFX_PAUSE "snd_pause"	//opening the pause screen
 #macro SFX_BUSH "snd_bush"	//cutting a bush
+#macro SFX_LENS "snd_lens"	//raising the Sun Lens
+#macro SFX_CRUMBLE_START "snd_crumble_start"	//a cracked floor tile starting to give way
+#macro SFX_CRUMBLE "snd_crumble"	//...and falling away
+#macro SFX_SAND "snd_sand"	//something burrowing into (or out of) the sand
+#macro SFX_SPHINX "snd_sphinx"	//the Sphinx's roar
+#macro SFX_QUAKE "snd_quake"	//the Sphinx's slam, a sand wave
+#macro SFX_SHOP_BUY "snd_shop_buy"	//paying at a shop
 
 ///sfx_play(name);
 function sfx_play(argument0) {

@@ -13,12 +13,11 @@ if (phase == "menu") {
 	draw_set_valign(fa_top);
 
 	menu_draw_text_colour(gw div 2, 56, "GAME OVER", make_colour_rgb(216, 40, 0));
-	var col = c_white;
-	if (cursor == 0) {col = MENU_COL_CURSOR}
-	menu_draw_text_colour(gw div 2, 92, "CONTINUE", col);
-	col = c_white;
-	if (cursor == 1) {col = MENU_COL_CURSOR}
-	menu_draw_text_colour(gw div 2, 108, "QUIT", col);
+	for (var i = 0; i < array_length(choices); i++) {
+		var col = c_white;
+		if (cursor == i) {col = MENU_COL_CURSOR}
+		menu_draw_text_colour(gw div 2, 92 + i * 16, choices[i], col);
+	}
 
 	draw_set_halign(fa_left);
 }

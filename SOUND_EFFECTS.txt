@@ -92,10 +92,22 @@ MENUS AND TEXT
 [HAVE] snd_text              (demo)  Text box letters typing out
 [HAVE] snd_pause             (demo)  Opening the pause screen
 
+TOWER OF LADHELLIN, SHOPS
+-------------------------
+[NEED] snd_lens                      Raising the Sun Lens
+[NEED] snd_crumble_start             A cracked floor tile starting to give way
+[NEED] snd_crumble                   ...and falling away into a hole
+[NEED] snd_sand                      A sandworm or antlion burrowing in or out of the sand
+[NEED] snd_sphinx                    The Mirage Sphinx's roar
+[NEED] snd_quake                     The Sphinx slamming the ground (its sand wave)
+[NEED] snd_shop_buy                  Paying at a shop's counter
+(the Sphinx also uses snd_wind, snd_fireball, snd_boss_defeat)
+
 MUSIC (already imported)
 ------------------------
 [HAVE] Title                 Title screen
 [HAVE] DungeonOne            The Southern Tower
+[HAVE] LadhellinTower        The Tower of Ladhellin (Menu_LadhellinTower)
 [HAVE] BossTheme             The Gargoyle fight
 
 

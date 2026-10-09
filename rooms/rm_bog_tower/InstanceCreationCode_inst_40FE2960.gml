@@ -1,0 +1,2 @@
+pair = "BB";
+up = false;

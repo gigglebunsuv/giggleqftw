@@ -3,7 +3,7 @@
 //Items go on the A or Y button and are picked on the pause screen.
 //Where each item sits on the pause screen grid is set in item_grid().
 //Using the newer items (bottles, lantern, rods, flute, hammer, shovel, cape, mirror) is in
-//the items_use script.
+//the items_use script. The Sun Lens is in the sun_lens script.
 //The shield is an item (put it on A or Y). Hold its button to raise it (see shield_is_held).
 //Its tier is global.shieldTier, see shield_set_tier.
 //
@@ -32,11 +32,13 @@ enum ITEM {
 	BOTTLE_3,
 	BOTTLE_4,
 	BOTTLE_5,
+	LENS,		//the Sun Lens (after the bottles, so older save files still line up)
 	COUNT
 }
 
 #macro BUN_PIECES 3
-#macro SWORD_TIER_MAX 4
+#macro SWORD_TIER_MAX 4			//1 iron, 2-3 forged by the smith with Star Iron (optional), 4 the Sword of Bun
+#macro SWORD_TIER_BUN 4
 #macro SHIELD_TIER_MAX 3
 #macro ARMOR_TIER_MAX 3
 
@@ -53,7 +55,7 @@ function item_grid() {
 	return [
 		ITEM.BOW,		ITEM.BOOMERANG,	ITEM.GRAPPLE,		ITEM.BOMBS,		ITEM.SHIELD,
 		ITEM.FIRE_ROD,	ITEM.ICE_ROD,	ITEM.LIGHTNING_ROD,	ITEM.LANTERN,	ITEM.HAMMER,
-		ITEM.SHOVEL,	ITEM.FLUTE,		ITEM.CAPE,			ITEM.MIRROR,	ITEM.NONE,
+		ITEM.SHOVEL,	ITEM.FLUTE,		ITEM.CAPE,			ITEM.MIRROR,	ITEM.LENS,
 		ITEM.BOTTLE_1,	ITEM.BOTTLE_2,	ITEM.BOTTLE_3,		ITEM.BOTTLE_4,	ITEM.BOTTLE_5
 	];
 
@@ -95,6 +97,7 @@ function item_get_name(argument0) {
 		case ITEM.SHOVEL: return "SHOVEL";
 		case ITEM.CAPE: return "CAPE";
 		case ITEM.MIRROR: return "MAGIC MIRROR";
+		case ITEM.LENS: return "SUN LENS";
 	}
 	if (bottle_is(argument0)) {return bottle_get_name(global.bottles[argument0 - ITEM.BOTTLE_1])}
 	return "";
@@ -120,6 +123,7 @@ function item_get_sprite(argument0) {
 		case ITEM.SHOVEL: return spr_item_shovel;
 		case ITEM.CAPE: return spr_item_cape;
 		case ITEM.MIRROR: return spr_item_mirror;
+		case ITEM.LENS: return spr_item_lens;
 	}
 	if (bottle_is(argument0)) {return spr_item_bottle}
 	return -1;
@@ -157,6 +161,7 @@ function item_use(argument0) {
 		case ITEM.SHOVEL: return item_use_shovel();
 		case ITEM.CAPE: return item_use_cape();
 		case ITEM.MIRROR: return item_use_mirror();
+		case ITEM.LENS: return item_use_lens();
 	}
 	if (bottle_is(argument0)) {return item_use_bottle(argument0)}
 	return false;

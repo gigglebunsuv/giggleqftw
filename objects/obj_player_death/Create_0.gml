@@ -18,5 +18,8 @@ fade_time = 30;
 fade = 0;			//black overlay, 0 to 1
 spin_sprites = [player_get_sprite("down"), player_get_sprite("left"), player_get_sprite("up"), player_get_sprite("right")];
 
-cursor = 0;			//0 CONTINUE, 1 QUIT
+//CONTINUE, SAVE AND QUIT (only when this game has a save file, see save_files), QUIT
+choices = ["CONTINUE", "SAVE AND QUIT", "QUIT"];
+if (global.save_slot < 0) {choices = ["CONTINUE", "QUIT"]}
+cursor = 0;
 continue_hearts = 3;	//hearts after continuing (never more than the max)

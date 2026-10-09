@@ -13,6 +13,7 @@
 //	dlg_set("flag")						sets a flag. dlg_set("flag", false) clears it, dlg_set("flag", 3) for numbers.
 //	dlg_run(function() {...})			runs some code, like dlg_run(function() {player_add_money(10)})
 //	dlg_end()							ends the conversation here
+//	dlg_shop("goods")					opens a shop's counter (see the shop script)
 //
 //Start one with dialogue_start(steps). obj_npc does it when Link faces it and presses A
 //(so does obj_sign, a kind of NPC). Opening an obj_chest shows one too (see the chests script).
@@ -86,6 +87,7 @@ function dialogue_start(argument0) {
 	if (instance_exists(obj_dialogue)) return noone;
 	var steps = argument0;
 	if (is_string(steps)) {steps = [steps]}
+	else if (is_method(steps)) {steps = steps()}
 	else if (!is_array(steps)) {steps = script_execute(steps)}
 	var d = instance_create_depth(0, 0, DIALOGUE_DEPTH, obj_dialogue);
 	d.stack = [{steps: steps, pos: 0}];
@@ -130,11 +132,15 @@ function dialogue_advance() {
 				flag_set(s.flag, s.value);
 				break;
 			case "run":
-				script_execute(s.func);
+				//Call methods directly: script_execute drops what they're bound to
+				if (is_method(s.func)) {s.func()} else {script_execute(s.func)}
 				break;
 			case "end":
 				stack = [];
 				break;
+			case "shop":
+				shop_ui_open(s.shop);
+				return;
 		}
 	}
 	dialogue_close();
@@ -150,7 +156,9 @@ function dialogue_check(argument0) {
 		if (is_string(v)) return v != "";
 		return v != 0;	//true, or a number other than 0
 	}
-	return script_execute(argument0);
+	var f = argument0;
+	if (is_method(f)) return f();
+	return script_execute(f);
 
 
 }

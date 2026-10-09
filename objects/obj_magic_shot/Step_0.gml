@@ -16,6 +16,9 @@ if (kind == SHOT.LANTERN || kind == SHOT.FIRE) {
 	if (bush != noone) {with (bush) {instance_destroy()}}
 	var grass = instance_place(x, y, obj_tallgrass_grass);
 	if (grass != noone) {with (grass) {instance_destroy()}}
+	//...and sets alight anything that burns (mummies, see enemy_ignite)
+	var burn = instance_place(x, y, obj_enemy);
+	if (burn != noone && (burn.level == -1 || burn.level == level)) {enemy_ignite(burn)}
 }
 if (kind == SHOT.LANTERN) exit;	//the lantern's flame doesn't hurt anything
 

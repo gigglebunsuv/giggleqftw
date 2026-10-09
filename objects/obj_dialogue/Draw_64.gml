@@ -1,5 +1,12 @@
 /// @description Text box, and the choice box when there's a question
 
+//A shop's counter instead of the text box (see the shop script)
+if (shop_on) {
+	shop_ui_draw();
+	drawn = true;
+	exit;
+}
+
 //Inside the play area (under the HUD bar)
 var area = hud_play_area();
 var gw = display_get_gui_width();

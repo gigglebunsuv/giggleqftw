@@ -27,7 +27,7 @@ if (state == "itemget") {
 }
 
 //Dungeon camera sliding to the next room, or the stairs to another floor: wait for it
-if (global.cam_transition || instance_exists(obj_floor_fade)) {
+if (global.cam_transition || instance_exists(obj_floor_fade) || instance_exists(obj_room_fade)) {
 	image_speed = 0;
 	exit;
 }
@@ -41,8 +41,9 @@ if (act_start && state == "idle") {
 	exit;
 }
 
-//In deep water? (flippers, see player_moves)
+//In deep water? (flippers, see player_moves) In quicksand? (see the ladhellin script)
 player_swim_check();
+player_quicksand_check();
 
 //B = sword, A and Y = equipped items (used further down). Not while swimming or carrying a rock.
 act_attack = act_b && global.swordTier > 0 && !swimming && !carrying;
@@ -87,7 +88,7 @@ if (keyboard_check_pressed(ord("F")))	{global.hasFlippers = !global.hasFlippers}
 if (keyboard_check_pressed(ord("R")))	{global.hasBoots = !global.hasBoots}
 if (keyboard_check_pressed(ord("0"))) {
 	var every = [ITEM.BOW, ITEM.BOMBS, ITEM.BOOMERANG, ITEM.GRAPPLE, ITEM.LANTERN, ITEM.FIRE_ROD, ITEM.ICE_ROD,
-		ITEM.LIGHTNING_ROD, ITEM.FLUTE, ITEM.HAMMER, ITEM.SHOVEL, ITEM.CAPE, ITEM.MIRROR];
+		ITEM.LIGHTNING_ROD, ITEM.FLUTE, ITEM.HAMMER, ITEM.SHOVEL, ITEM.CAPE, ITEM.MIRROR, ITEM.LENS];
 	for (var i = 0; i < array_length(every); i++) {item_give(every[i])}
 }
 if (keyboard_check_pressed(ord("B"))) {
@@ -168,6 +169,10 @@ if (swimming) {
 	hspd *= SWIM_SPEED;
 	vspd *= SWIM_SPEED;
 }
+if (in_sand) {
+	hspd *= QUICKSAND_SLOW;
+	vspd *= QUICKSAND_SLOW;
+}
 
 //Movement
 anim_rate = 0;
@@ -207,8 +212,8 @@ if(act_attack&&state="idle"){
 }
 
 // Open the chest, or talk to the NPC (or read the sign) Link is facing with A
-// (instead of using the item on A)
-if (act_a && state == "idle" && !carrying) {
+// (instead of using the item on A). Not from the water: a chest in a flooded basin waits till it's drained.
+if (act_a && state == "idle" && !carrying && !swimming) {
 	var chest = chest_in_front();
 	if (chest != noone) {
 		chest_open(chest);

@@ -207,8 +207,12 @@ function player_jump_start() {
 	jump_t = 0;
 	z = 0;
 	shielding = false;
-	air_h = hspd;
-	air_v = vspd;
+	//Full walking speed, even jumping out of quicksand or with the shield up
+	var m = spd;
+	if (xx != 0 && yy != 0) {m *= 0.7071}
+	air_h = xx * m;
+	air_v = yy * m;
+	sink_t = 0;
 	fall_grace = 0;
 	sfx_play(SFX_JUMP);
 	return true;
@@ -275,7 +279,8 @@ function player_pit_check() {
 		return;
 	}
 	fall_grace = 0;
-	if (state == "idle" && !swimming && collision_rectangle(x - 8, y - 8, x + 8, y + 8, obj_pit, false, true) == noone) {
+	if (state == "idle" && !swimming && !in_sand && collision_rectangle(x - 8, y - 8, x + 8, y + 8, obj_pit, false, true) == noone
+		&& collision_rectangle(x - 8, y - 8, x + 8, y + 8, obj_quicksand, false, true) == noone) {
 		safe_x = x;
 		safe_y = y;
 		safe_level = level;
@@ -309,8 +314,10 @@ function player_fall_step() {
 	image_xscale = s;
 	image_yscale = s;
 	if (fall_t >= FALL_TIME) {
-		//A dungeon floor with a floor under it: he drops down to it instead
-		if (floor_drop()) return;
+		//A dungeon floor with a floor under it: he drops down to it instead (not out of quicksand)
+		var no_drop = fall_no_drop;
+		fall_no_drop = false;
+		if (!no_drop && floor_drop()) return;
 		image_xscale = 1;
 		image_yscale = 1;
 		x = safe_x;
@@ -342,7 +349,10 @@ function player_lift_rocks() {
 			pushing = true;
 			lift_timer++;
 			if (lift_timer >= LIFT_TIME) {
-				with (rock) {instance_destroy()}
+				with (rock) {
+					if (flag != "") {flag_set(flag, true)}
+					instance_destroy();
+				}
 				carrying = true;
 				state = "lift";
 				cnt = 0;

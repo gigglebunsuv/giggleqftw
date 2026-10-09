@@ -15,6 +15,12 @@ if (!frozen) {
 	exit;
 }
 
+//A shop's counter is open instead of the text box
+if (shop_on) {
+	shop_ui_step();
+	exit;
+}
+
 //Typing out: A or B shows the rest of the box at once
 if (shown < page_len) {
 	var before = floor(shown);

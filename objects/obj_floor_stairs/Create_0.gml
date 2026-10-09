@@ -3,8 +3,10 @@
 //on the other floor. Set in its Creation Code:
 //	pair = "A";				the two ends of a staircase share a pair name
 //	up = true;				stairs up (false = stairs down, only changes the picture)
+//	show = false;			no picture (the room's tiles draw the stairs: the houses in rm_interiors)
 
 pair = "";
 up = true;
+show = true;
 depth = DEPTH_DECOR;
 ready = false;

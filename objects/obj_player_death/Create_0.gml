@@ -7,6 +7,7 @@ instance_activate_object(obj_hud_main);
 
 audio_stop_all();
 sfx_play(SFX_PLAYER_DIE);
+global.deaths++;	//shown on the file select
 
 menu_font = font_add_sprite_ext(spr_menu_font, " ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-:!?.'/", false, 0);
 

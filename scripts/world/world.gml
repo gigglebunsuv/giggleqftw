@@ -22,10 +22,11 @@
 
 ///world_start_new_game();
 function world_start_new_game() {
-	//Play from the title: the very start of the game. Link stands in front of his house with
-	//3 hearts, the tunic and the flute, and nothing else: no sword, no shield, no money.
-	//The knight at the village's north gate gives him the sword and shield (dlg_village_guard),
-	//the lantern comes from the lamplighter's side quest, the rest from shops, caves and dungeons.
+	//Play from the title: the very start of the game. Link wakes up in his bed (the opening, see
+	//the cutscene script) with 3 hearts, the tunic and the flute, and nothing else: no sword, no
+	//shield, no money. The shield is in a chest in his cellar. The knight at the village's north gate
+	//gives him the sword once he's passed the Old Well trial (dlg_village_guard). The lantern is
+	//down the Old Well too, the rest comes from shops, caves, houses and dungeons.
 	global.pHealthMax = 6;
 	global.pHealth = 6;
 	global.pMagic = global.pMagicMax;
@@ -45,8 +46,10 @@ function world_start_new_game() {
 ///world_room_start();
 function world_room_start() {
 	//Run by obj_world at Room Start: the music for the area Link starts in
+	//(and in rm_interiors, a new file's opening)
 	area = noone;
 	world_music_play(world_zone_music(cam_zone_at(obj_link.x, obj_link.y)));
+	if (room == rm_interiors) {intro_room_start()}
 
 
 }
@@ -78,7 +81,7 @@ function world_music_play(argument0) {
 	if (argument0 == -1) return;
 	if (variable_global_exists("world_music") && global.world_music == argument0 && audio_is_playing(argument0)) return;
 	//Stop the other music (not the sound effects)
-	var tracks = [Overworld, Village, DungeonOne, BogTower, LadhellinTower, BossTheme, House, Intro, Title, FileSelect];
+	var tracks = [Overworld, Village, DungeonOne, BogTower, LadhellinTower, BossTheme, House, ShopTheme, Intro, Title, FileSelect];
 	for (var i = 0; i < array_length(tracks); i++) {audio_stop_sound(tracks[i])}
 	audio_play_sound(argument0, 1, true);
 	global.world_music = argument0;

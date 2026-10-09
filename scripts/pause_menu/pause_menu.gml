@@ -272,6 +272,8 @@ function pause_draw_quest() {
 	//The hammer's trading chain: what Link is carrying to trade (in the other corner, see the trade_quest script)
 	var trade = trade_at();
 	if (trade >= TRADE_FISH && trade < TRADE_DONE) {draw_sprite(spr_trade_item, trade - 1, bun_box_x + 6, page_y + 17)}
+	//The knight's medal from the Old Well, until it's been handed back (see dlg_village_guard)
+	else if (flag_get(QUEST_MEDAL_FLAG) && !flag_get("got_first_sword")) {draw_sprite(spr_quest_item, 0, bun_box_x + 6, page_y + 17)}
 
 	//--- Map of this room (taken when the menu opened, see menu_map_build)
 	var map_y = page_y + 44;

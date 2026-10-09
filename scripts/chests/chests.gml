@@ -122,6 +122,7 @@ function chest_item_name() {
 		case "heart": return "HEART CONTAINER";
 		case "heart_piece": return "PIECE OF HEART";
 		case "ore": return "STAR IRON";
+		case "medal": return "KNIGHT'S MEDAL";
 		case "bun": return "PIECE OF THE BUN";
 		case "refill": return "FULL REFILL";
 		case "money": return string(amount) + " MONEY";
@@ -168,6 +169,7 @@ function chest_item_desc() {
 		case "quiver": return "YOU CAN CARRY MORE ARROWS NOW.";
 		case "heart": return "YOUR LIFE WENT UP BY ONE HEART!";
 		case "heart_piece": return heart_piece_desc();
+		case "medal": return "THE KNIGHT LEFT IT DOWN HERE FOR HIS SQUIRES TO FIND. TAKE IT BACK TO HIM AT THE VILLAGE'S NORTH GATE.";
 		case "ore": return "A LUMP OF IRON THAT FELL FROM THE STARS. THE SMITH IN HAVEN VILLAGE CAN FORGE IT INTO YOUR SWORD.";
 		case "bun": return "FIND EVERY PIECE TO OPEN THE WAY TO THE HIDDEN FOREST.";
 		case "refill": return "HEALTH, MAGIC, BOMBS AND ARROWS ARE ALL FULL AGAIN.";

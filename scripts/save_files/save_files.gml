@@ -3,8 +3,10 @@
 //
 //A file holds the player's name and everything that counts as progress: hearts, money, equipment,
 //items, bottles, ammo, the Bun, story flags (chests opened, bosses beaten, doors...), dungeon keys,
-//maps and compasses. Loading puts Link back at a safe spot, like A Link to the Past: the dungeon's
-//entrance if he saved inside a dungeon, otherwise in front of his house.
+//maps and compasses, and the play time and deaths (shown on the file select). Loading puts Link back
+//at a safe spot, like A Link to the Past: the dungeon's entrance if he saved inside a dungeon,
+//otherwise in front of his house. A brand new file starts in his bed, with the opening (see the
+//cutscene script); a file saved before the opening was over plays it again.
 //
 //global.save_slot is the file being played (0-2), or -1 for games started from the DEBUG menu
 //(they can't be saved). Saving: the pause screen's SAVE AND CONTINUE / SAVE AND QUIT, and SAVE AND
@@ -21,6 +23,8 @@
 
 global.save_slot = -1;
 global.player_name = "";
+global.playTime = 0;	//seconds played on this file (obj_link counts them)
+global.deaths = 0;		//times Link has died on this file (obj_player_death counts them)
 
 ///save_file_name(slot);
 function save_file_name(argument0) {
@@ -52,14 +56,18 @@ function save_read(argument0) {
 
 ///save_summary(slot);
 function save_summary(argument0) {
-	//What the file select shows for a slot: {used, name, hearts, bun (array of 3 true/false)}
+	//What the file select shows for a slot: {used, name, hearts, bun (array of 3 true/false),
+	//sword (tier, 0 = none yet), time (seconds played), deaths}
 	var data = save_read(argument0);
-	var s = {used: false, name: "", hearts: 0, bun: array_create(BUN_PIECES, false)};
+	var s = {used: false, name: "", hearts: 0, bun: array_create(BUN_PIECES, false), sword: 0, time: 0, deaths: 0};
 	if (data == undefined) return s;
 	s.used = true;
 	s.name = save_get(data, "name", "");
 	s.hearts = ceil(save_get(data, "health_max", 6) / 2);
 	s.bun = save_array_fit(save_get(data, "bun", []), BUN_PIECES, false);
+	s.sword = save_get(data, "sword", 0);
+	s.time = save_get(data, "play_time", 0);
+	s.deaths = save_get(data, "deaths", 0);
 	return s;
 
 
@@ -129,7 +137,9 @@ function save_collect() {
 		boss_key: save_array_fit(global.bossKey, DUNGEON_COUNT, false),
 		dungeon_map: save_array_fit(global.dungeonMap, DUNGEON_COUNT, false),
 		dungeon_compass: save_array_fit(global.dungeonCompass, DUNGEON_COUNT, false),
-		flags: global.flags
+		flags: global.flags,
+		play_time: floor(global.playTime),
+		deaths: global.deaths
 	};
 
 
@@ -195,6 +205,8 @@ function save_reset_progress() {
 	global.bunPieces = array_create(BUN_PIECES, false);
 	global.heartPieces = 0;
 	global.flags = {};
+	global.playTime = 0;
+	global.deaths = 0;
 	dungeon_init();
 
 
@@ -236,6 +248,8 @@ function save_apply(argument0) {
 	var flags = save_get(d, "flags", {});
 	if (!is_struct(flags)) {flags = {}}
 	global.flags = flags;
+	global.playTime = save_get(d, "play_time", 0);
+	global.deaths = save_get(d, "deaths", 0);
 	//Outside every dungeon for now: walking into one swaps its keys in (dungeon_room_start)
 	global.dungeon = 0;
 	global.pKeys = global.dungeonKeys[0];
@@ -269,15 +283,16 @@ function save_start_link(argument0, argument1) {
 ///save_new_game(slot, name);
 function save_new_game(argument0, argument1) {
 	//PLAY on an empty file: a brand new game with this name, saved straight away,
-	//starting in front of Link's house
-	save_start_link(WORLD_START_X, WORLD_START_Y);
+	//starting in Link's bed with the opening (see the cutscene script)
+	save_start_link(HOME_GETUP_X, HOME_GETUP_Y);
 	save_reset_progress();
 	world_start_new_game();
 	global.player_name = argument1;
 	global.save_slot = argument0;
 	save_write(argument0);
 	global.pause_block = true;	//so Link ignores the button that started the game
-	room_goto(rm_overworld);
+	global.intro_pending = true;
+	room_goto(rm_interiors);
 
 
 }
@@ -287,10 +302,18 @@ function save_load_game(argument0) {
 	//PLAY on a used file: load it and start at the safe spot (see save_respawn)
 	var data = save_read(argument0);
 	if (data == undefined) return false;
-	var at = save_respawn(save_get(data, "dungeon", 0));
-	save_start_link(at[1], at[2]);
+	//Make Link first: his Create event sets up a fresh game's gear (sword, bow, flute, 3 hearts),
+	//which would wipe out the file's progress if he were made after it was loaded
+	save_start_link(0, 0);
 	save_reset_progress();
 	save_apply(data);
+	var at = save_respawn(save_get(data, "dungeon", 0));
+	//Saved before the opening was over (quit during it): back in bed, and it plays again
+	if (!flag_get(INTRO_FLAG)) {
+		at = [rm_interiors, HOME_GETUP_X, HOME_GETUP_Y];
+		global.intro_pending = true;
+	}
+	save_start_link(at[1], at[2]);
 	global.save_slot = argument0;
 	global.pause_block = true;
 	room_goto(at[0]);

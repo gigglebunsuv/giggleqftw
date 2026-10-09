@@ -1,5 +1,5 @@
 //The title's PLAY screens (run by obj_title, see its menu variable):
-//	3 FILE SELECT	the three save files: name, hearts and Bun pieces, or - EMPTY -
+//	3 FILE SELECT	the three save files: name, hearts, sword, play time, deaths and Bun pieces, or - EMPTY -
 //	4 FILE			a used file was picked: START or ERASE
 //	5 ERASE?		NO / YES
 //	6 NAME ENTRY	an empty file was picked: a letter grid, then the new game starts
@@ -230,6 +230,17 @@ function name_entry_finish() {
 
 }
 
+///file_select_time(seconds);
+function file_select_time(argument0) {
+	//Play time as H:MM (hours, minutes)
+	var m = floor(argument0 / 60);
+	var h = m div 60;
+	m = m mod 60;
+	return string(h) + ":" + ((m < 10) ? "0" : "") + string(m);
+
+
+}
+
 ///file_select_draw(gui_w, gui_h);
 function file_select_draw(argument0, argument1) {
 	//Run by obj_title's Draw GUI for menus 3-6, over the title art. Menu font set, valign top.
@@ -268,6 +279,14 @@ function file_select_draw(argument0, argument1) {
 			for (var h = 0; h < s.hearts; h++) {
 				draw_sprite(spr_hud_heart, 0, px + 18 + (h mod 8) * 8, py + 15 + (h div 8) * 8);
 			}
+			//The middle: the sword, the play time and the deaths
+			var mx = px + 88;
+			if (s.sword > 0) {draw_sprite(spr_menu_sword, clamp(s.sword, 1, SWORD_TIER_MAX) - 1, mx, py + 9)}
+			else {menu_draw_rect(mx + 4, py + 15, 8, 1, MENU_COL_DIM)}
+			draw_set_font(small_font);
+			menu_draw_text_colour(mx + 20, py + 8, "TIME " + file_select_time(s.time), col);
+			menu_draw_text_colour(mx + 20, py + 18, "DEATHS " + string(s.deaths), col);
+			draw_set_font(menu_font);
 			for (var b = 0; b < BUN_PIECES; b++) {
 				var frame = 0;
 				if (s.bun[b]) {frame = b + 1}

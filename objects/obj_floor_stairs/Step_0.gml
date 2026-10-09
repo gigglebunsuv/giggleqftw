@@ -3,6 +3,7 @@
 if (!ready) {
 	ready = true;
 	sprite_index = up ? spr_tower_stairs_up : spr_tower_stairs_down;
+	if (!show) {visible = false}
 }
 if (!instance_exists(obj_link) || instance_exists(obj_floor_fade) || instance_exists(obj_room_fade) || global.cam_transition) exit;
 //Not while a boss is awake nearby

@@ -65,6 +65,8 @@
 #macro SFX_SAND "snd_sand"	//something burrowing into (or out of) the sand
 #macro SFX_SPHINX "snd_sphinx"	//the Sphinx's roar
 #macro SFX_QUAKE "snd_quake"	//the Sphinx's slam, a sand wave
+#macro SFX_KNOCK "snd_knock"	//knocking at the door (the opening)
+#macro SFX_THUNDER "snd_thunder"	//thunder in the dream (the opening)
 #macro SFX_SHOP_BUY "snd_shop_buy"	//paying at a shop
 
 ///sfx_play(name);

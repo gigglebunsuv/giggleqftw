@@ -1,3 +1,6 @@
+//Play time (shown on the file select)
+global.playTime += delta_time / 1000000;
+
 //Dead: obj_player_death handles the spin and the game over screen
 if (state == "dead") exit;
 
@@ -16,6 +19,12 @@ if (global.pause_block) {
 
 //Talking: obj_dialogue has the game frozen until the conversation ends
 if (state == "talk") {
+	image_speed = 0;
+	exit;
+}
+
+//The opening is playing (see the cutscene script): stand still
+if (instance_exists(obj_cutscene)) {
 	image_speed = 0;
 	exit;
 }

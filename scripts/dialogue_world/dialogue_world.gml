@@ -66,7 +66,8 @@ function dlg_village_elder() {
 
 ///dlg_village_guard();
 function dlg_village_guard() {
-	//Gives Link his first sword and shield, the first time he talks to him
+	//The knight at the north gate: Link proves himself with the Old Well trial (no sword, just his
+	//father's shield from the cellar), brings back the knight's medal, and gets the knight's old sword
 	return [
 		dlg_if("got_first_sword", [
 			"THE ROAD NORTH CROSSES THE RIVER TO OLD CASTLE TOWN.",
@@ -74,12 +75,33 @@ function dlg_village_guard() {
 			"AND IF THAT OLD SWORD FEELS DULL, SEE THE SMITH BY THE MARKET. GIVE HIM STAR IRON AND HE'LL MAKE IT SING.",
 			"THEY SAY THE BEASTS GUARDING THE TOWERS CARRY IT."
 		], [
-			"SIR GIGGLEBUNS! YOU CAN'T GO OUT THERE EMPTY-HANDED. SLIMES IN THE FIELDS, WOLVES IN THE FOREST...",
-			"TAKE MY OLD SWORD AND SHIELD. THEY'VE SEEN BETTER DAYS, BUT THEY'LL KEEP YOU SAFE.",
-			dlg_run(function() {
-				dialogue_insert(array_concat(world_give({equip: "sword", tier: 1}), world_give({item: ITEM.SHIELD, tier: 1})));
-			}),
-			dlg_set("got_first_sword")
+			dlg_if(QUEST_MEDAL_FLAG, [
+				"MY MEDAL! YOU WENT ALL THE WAY DOWN THE OLD WELL WITH NOTHING BUT A SHIELD?",
+				"HA! YOUR FATHER TOOK TWO TRIES. YOU'VE EARNED THIS, SIR GIGGLEBUNS.",
+				"MY OLD SWORD. IT'S SEEN BETTER DAYS, BUT SO HAVE I. TAKE IT, AND GIVE THE ORDER WHAT FOR!",
+				dlg_run(function() {
+					dialogue_insert(world_give({equip: "sword", tier: 1}));
+				}),
+				dlg_set("got_first_sword")
+			], [
+				dlg_if(function() {return global.shieldTier > 0;}, [
+					dlg_if("well_trial_told", [
+						"THE OLD WELL, JUST SOUTH OF THE VILLAGE. SHIELD UP AT THE SPITTERS, DODGE THE RATS, STEP ON THE STONE.",
+						"MY MEDAL IS AT THE VERY BOTTOM. BRING IT BACK AND THE SWORD IS YOURS."
+					], [
+						"THAT'S YOUR FATHER'S SHIELD! SO THE ELDER SENT YOU. GOOD.",
+						"BUT A SWORD IS NOT A TOY. EVERY SQUIRE OF HAVEN HAS TO PASS THE WELL TRIAL FIRST.",
+						"I LEFT MY MEDAL AT THE BOTTOM OF THE OLD WELL, SOUTH OF THE VILLAGE. GO DOWN WITH ONLY YOUR SHIELD AND BRING IT BACK.",
+						"THE PLANTS DOWN THERE SPIT SEEDS. FACE THEM WITH YOUR SHIELD UP AND THE SEEDS BOUNCE OFF.",
+						"THE RATS YOU'LL JUST HAVE TO DODGE. AND THERE'S A STONE IN THE FLOOR THAT OPENS THE WAY DOWN. GOOD LUCK!",
+						dlg_set("well_trial_told")
+					])
+				], [
+					"SIR GIGGLEBUNS! YOU CAN'T GO OUT THERE EMPTY-HANDED. SLIMES IN THE FIELDS, WOLVES IN THE FOREST...",
+					"NO SWORD, NO SHIELD? DIDN'T YOUR FATHER LEAVE YOU HIS SHIELD? CHECK YOUR CELLAR.",
+					"COME BACK WITH IT, AND WE'LL TALK ABOUT A SWORD."
+				])
+			])
 		])
 	];
 

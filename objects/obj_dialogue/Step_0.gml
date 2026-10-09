@@ -2,6 +2,13 @@
 
 input_get();
 
+//Start during the opening skips it (see the cutscene script)
+if (act_start && global.cutscene_on) {
+	global.cutscene_skip = true;
+	dialogue_close();
+	exit;
+}
+
 //Freeze the game once the frame with the NPC turned to Link has been drawn.
 //This also skips the button that started talking, which still counts as pressed.
 if (!frozen) {

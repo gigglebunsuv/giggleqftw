@@ -103,6 +103,12 @@ TOWER OF LADHELLIN, SHOPS
 [NEED] snd_shop_buy                  Paying at a shop's counter
 (the Sphinx also uses snd_wind, snd_fireball, snd_boss_defeat)
 
+THE OPENING (a new file: the dream, then waking up at home)
+-----------
+[NEED] snd_thunder                   Thunder in the dream (the Evil King appearing, then lightning)
+[NEED] snd_knock                     The elder knocking at Gigglebuns's door
+(the elder coming in and going out uses snd_door)
+
 MUSIC (already imported)
 ------------------------
 [HAVE] Title                 Title screen

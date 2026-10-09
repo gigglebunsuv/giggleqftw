@@ -13,6 +13,8 @@ spd = WALK_SPEED;	//see the player_moves script
 move_frac_x = 0;	//leftover fractions of a pixel (see player_move)
 move_frac_y = 0;
 grd=sprite_width;
+xx = 0;	//d-pad this step (set in Step, read by doors)
+yy = 0;
 dir="right";
 state="idle";
 global.pHealth = 6;
@@ -53,6 +55,10 @@ global.hasFlippers = false;	//passive
 //The Bun, one piece per dungeon
 global.bunPieces = array_create(BUN_PIECES, false);
 
+//Dungeons: keys, boss keys, maps, compasses (see the dungeon script), and the floor Link's on
+dungeon_init();
+cur_floor = noone;
+
 //Story flags set by conversations (see the dialogue_system script), cleared for a new game
 global.flags = {};
 
@@ -92,6 +98,12 @@ fall_grace = 0;
 fall_t = 0;
 safe_x = x;
 safe_y = y;
+safe_level = 0;
+
+//Hopping down off a ledge (see ledge_hop_check): where the hop starts and lands
+hop_y0 = y;
+hop_y1 = y;
+hop_level = 0;
 
 //Getting hurt (see player_hurt)
 hurt_timer = 0;

@@ -14,4 +14,6 @@ state = "walk";
 aim_timer = 0;
 aim_time = 30;		//the pause before throwing
 throw_cd = 60;		//time until it can throw again
+face = move_dir;	//the way it faces: 4-way sprite (see enemy_face_frame)
+anim_t = 0;
 image_speed = 0;

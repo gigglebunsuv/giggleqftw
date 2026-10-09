@@ -2,6 +2,7 @@
 //[ and ] (LB and RB) switch pages:
 //	0 ITEMS		the item grid (put items on A or Y), the buttons, preassigned equipment (sword, boots)
 //	1 QUEST		passive equipment (gloves, armor, flippers), The Bun, the map of this room
+//				(in a dungeon: one floor at a time, up/down for the others, see the dungeon_map script)
 //	2 SETTINGS	resume, options (the controls list, the volume: options_menu script), back to the title screen
 //The screen covers the whole window (the HUD bar too). GUI is 256x208.
 
@@ -245,6 +246,10 @@ function pause_draw_quest() {
 	var map_y = page_y + 44;
 	var map_h = page_h - 44;
 	menu_draw_box(4, map_y, gw - 8, map_h);
+	if (variable_struct_exists(map, "floors")) {
+		dungeon_map_draw(4, map_y, gw - 8, map_h, map);
+		return;
+	}
 	draw_set_halign(fa_center);
 	menu_draw_text(gw div 2, map_y + 5, "MAP");
 	draw_set_halign(fa_left);

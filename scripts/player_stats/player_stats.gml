@@ -103,10 +103,10 @@ function player_armor_damage(argument0) {
 function player_hurt(argument0, argument1, argument2) {
 	//Damages Link (less with better armor) and knocks him away from (from_x, from_y).
 	//Ignored while he's still flashing from the last hit, being pulled by the grapple hook,
-	//falling into a pit, or holding up something he got from a chest.
+	//falling into a pit, hopping down off a ledge, or holding up something he got from a chest.
 	//Knocks him out of a jump, and he drops a rock he's carrying.
 	with (obj_link) {
-		if (hurt_timer <= 0 && state != "pull" && state != "fall" && state != "itemget") {
+		if (hurt_timer <= 0 && state != "pull" && state != "fall" && state != "itemget" && state != "hop") {
 			z = 0;
 			pose = -1;
 			if (carrying) {

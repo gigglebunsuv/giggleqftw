@@ -6,6 +6,8 @@ image_speed = 0;
 image_index = global.swordTier - 1;
 visible = true;
 
+sfx_play(SFX_SWORD);
+
 //Set timer
 cnt = 0;
 dur = 10;

@@ -1,13 +1,14 @@
 /// @description Walk, spot Link, pause, throw
 
 event_inherited();
-if (!active) {image_speed = 0; exit;}
+if (!active) exit;
 if (kb_timer > 0 || stun_timer > 0) exit;
 
 if (throw_cd > 0) {throw_cd--}
 
 if (state == "walk") {
-	image_speed = 0.15;
+	anim_t += 0.15;
+	face = move_dir;
 	//Bumping into a wall picks a new direction
 	if (level_move(lengthdir_x(spd, move_dir), lengthdir_y(spd, move_dir), level)) {move_timer = 0}
 	move_timer--;
@@ -19,8 +20,7 @@ if (state == "walk") {
 	if (throw_cd <= 0 && enemy_can_see_link(sight)) {
 		state = "aim";
 		aim_timer = aim_time;
-		image_speed = 0;
-		image_index = 0;
+		face = enemy_dir4(point_direction(x, y, obj_link.x, obj_link.y));
 	}
 } else if (state == "aim") {
 	aim_timer--;
@@ -34,3 +34,5 @@ if (state == "walk") {
 		state = "walk";
 	}
 }
+
+image_index = enemy_face_frame(face, floor(anim_t));

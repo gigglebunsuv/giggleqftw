@@ -161,6 +161,9 @@ function menu_map_build() {
 		map.link_y = obj_link.y;
 	}
 
+	//Dungeons with floors: one floor at a time (see the dungeon_map script)
+	if (instance_exists(obj_floor) && global.dungeon > 0) {return dungeon_map_build(map)}
+
 	if (instance_exists(obj_cam_zone)) {
 		with (obj_cam_zone) {
 			array_push(map.rooms, [bbox_left, bbox_top, bbox_right + 1, bbox_bottom + 1, id == global.cam_zone]);

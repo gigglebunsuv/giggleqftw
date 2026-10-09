@@ -360,7 +360,11 @@ function pickup_collect(argument0) {
 		case PICKUP.MONEY20: player_add_money(20); break;
 		case PICKUP.MAGIC: player_add_magic(8); break;
 	}
-	sfx_play(SFX_PICKUP);
+	switch (argument0) {
+		case PICKUP.HEART: sfx_play(SFX_HEART); break;
+		case PICKUP.MAGIC: sfx_play(SFX_MAGIC); break;
+		default: sfx_play(SFX_MONEY); break;
+	}
 
 
 }
@@ -402,9 +406,28 @@ function treasure_collect() {
 				break;
 			case "money": player_add_money(amount); break;
 			case "key": player_add_keys(amount); break;
+			case "map": global.dungeonMap[global.dungeon] = true; break;
+			case "compass": global.dungeonCompass[global.dungeon] = true; break;
+			case "boss_key": global.bossKey[global.dungeon] = true; break;
 		}
 	}
-	sfx_play(SFX_ITEM_GET);
+	sfx_play(treasure_fanfare());
+
+
+}
+
+///treasure_fanfare();
+function treasure_fanfare() {
+	//Run by obj_treasure / obj_item_get: which sound plays for what it holds (see the sfx script)
+	if (item != ITEM.NONE) return SFX_FANFARE_ITEM;
+	switch (equip) {
+		case "heart": return SFX_HEART_CONTAINER;
+		case "bun": return SFX_FANFARE_BUN;
+		case "sword": case "shield": case "armor": case "gloves": case "flippers": case "boots":
+		case "bomb_bag": case "quiver": case "boss_key":
+			return SFX_FANFARE_ITEM;
+	}
+	return SFX_ITEM_GET;
 
 
 }
@@ -424,11 +447,14 @@ function treasure_icon() {
 		case "boots": return [spr_menu_boots, 0];
 		case "bomb_bag": return [spr_item_bombs, 0];
 		case "quiver": return [spr_item_bow, 0];
-		case "heart": return [spr_pickup, PICKUP.HEART];
+		case "heart": return [spr_heart_container, 0];
 		case "bun": return [spr_menu_bun, 1];
 		case "refill": return [spr_pickup, PICKUP.MAGIC];
 		case "money": return [spr_pickup, PICKUP.MONEY20];
-		case "key": return [spr_hud_counters, 1];
+		case "key": return [spr_key_small, 0];
+		case "map": return [spr_dungeon_map, 0];
+		case "compass": return [spr_dungeon_compass, 0];
+		case "boss_key": return [spr_boss_key, 0];
 	}
 	return [-1, 0];
 

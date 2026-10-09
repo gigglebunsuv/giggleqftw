@@ -1,5 +1,7 @@
 /// @description Pause screen (pages are in the pause_menu script)
 
+sfx_play(SFX_PAUSE);
+
 //The map needs Link and the camera zones, so take it before everything is deactivated
 map = menu_map_build();
 instance_deactivate_all(true);

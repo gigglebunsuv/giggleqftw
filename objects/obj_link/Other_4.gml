@@ -17,14 +17,18 @@ if (level_room_uses_levels()) {
 }
 
 //The grapple hook doesn't come along to the new room, and a jump or fall is over
-if (state == "hook" || state == "pull" || state == "jump" || state == "fall") {state = "idle"}
+if (state == "hook" || state == "pull" || state == "jump" || state == "fall" || state == "land" || state == "hop") {state = "idle"}
 z = 0;
 image_xscale = 1;
 image_yscale = 1;
 move_frac_x = 0;
 move_frac_y = 0;
 
+//This dungeon's small keys, the floor's name (see the dungeon script)
+dungeon_room_start();
+
 //Falling into a pit brings him back here until he's walked somewhere safe
 safe_x = x;
 safe_y = y;
+safe_level = 0;
 fall_grace = 0;

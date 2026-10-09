@@ -87,6 +87,7 @@ switch (menu) {
 			if (!instance_exists(obj_link)) {instance_create_depth(c[2], c[3], 0, obj_link)}
 			obj_link.x = c[2];
 			obj_link.y = c[3];
+			if (array_length(c) > 4) {script_execute(c[4])}
 			global.pause_block = true;	//so Link ignores the button that started the game
 			room_goto(c[1]);
 		}

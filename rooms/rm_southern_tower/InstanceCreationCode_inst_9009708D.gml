@@ -1,0 +1,2 @@
+pair = "C";
+up = true;

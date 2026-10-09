@@ -25,6 +25,13 @@ if (state == "out") {
 			sfx_play(SFX_HOOK_HIT);
 			break;
 		}
+		//Grabs a small key and brings it back to Link
+		var key = instance_place(x, y, obj_key);
+		if (key != noone && key.shown) {
+			carry = key;
+			state = "back";
+			break;
+		}
 		var hit = instance_place(x, y, obj_enemy);
 		if (hit != noone && (hit.level == -1 || hit.level == level)) {
 			enemy_stun(hit, ITEM_STUN_TIME);
@@ -45,6 +52,10 @@ if (state == "out") {
 	var ang = point_direction(x, y, obj_link.x, obj_link.y);
 	x += lengthdir_x(spd_back, ang);
 	y += lengthdir_y(spd_back, ang);
+	if (instance_exists(carry)) {
+		carry.x = x;
+		carry.y = y;
+	}
 	if (point_distance(x, y, obj_link.x, obj_link.y) <= spd_back) {
 		if (obj_link.state == "hook") {obj_link.state = "idle"}
 		instance_destroy();

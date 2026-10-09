@@ -24,5 +24,6 @@ if (menu_page != 0) {
 
 switch (page) {
 	case 0: pause_step_items(); break;
+	case 1: dungeon_map_step(map); break;
 	case 2: pause_step_settings(); break;
 }

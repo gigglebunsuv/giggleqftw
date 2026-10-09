@@ -11,3 +11,4 @@ max_dist = 96;	//length of the chain
 dist = 0;
 level = 0;
 target = noone;	//the grapple point it caught
+carry = noone;	//a small key (obj_key) it grabbed and is bringing back

@@ -9,6 +9,7 @@ z = lerp(start_z, 0, t) + arc * 4 * t * (1 - t);
 //Walls for its level (the rock's body is about 12 x 12)
 var level_wall = obj_wall_low;
 if (level == 1) {level_wall = obj_wall_high}
+if (level == 2) {level_wall = obj_wall_top}
 var hit_wall = collision_rectangle(x - 5, y - 5, x + 5, y + 5, obj_wall, false, true) != noone
 	|| collision_rectangle(x - 5, y - 5, x + 5, y + 5, level_wall, false, true) != noone;
 

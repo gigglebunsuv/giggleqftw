@@ -265,3 +265,25 @@ function hud_draw_button(argument0, argument1, argument2, argument3, argument4) 
 
 
 }
+
+///hud_draw_floor_name();
+function hud_draw_floor_name() {
+	//A dungeon floor's name ("2F") in the play area's top left for a moment after changing floors
+	if (global.floor_name_timer <= 0) return;
+	global.floor_name_timer--;
+	if (!variable_global_exists("hud_font")) {
+		global.hud_font = font_add_sprite_ext(spr_menu_font, " ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-:!?.'/", false, 0);
+	}
+	var a = hud_play_area();
+	var w = string_length(global.floor_name) * 8 + 8;
+	var fade = min(1, global.floor_name_timer / 15);
+	draw_sprite_ext(spr_pixel, 0, a[0] + 6, a[1] + 6, w, 14, 0, c_black, fade);
+	draw_set_alpha(fade);
+	draw_set_font(global.hud_font);
+	draw_set_halign(fa_left);
+	draw_set_valign(fa_top);
+	menu_draw_text(a[0] + 10, a[1] + 9, global.floor_name);
+	draw_set_alpha(1);
+
+
+}

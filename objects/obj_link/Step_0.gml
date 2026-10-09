@@ -26,11 +26,14 @@ if (state == "itemget") {
 	exit;
 }
 
-//Dungeon camera sliding to the next room: wait for it
-if (global.cam_transition) {
+//Dungeon camera sliding to the next room, or the stairs to another floor: wait for it
+if (global.cam_transition || instance_exists(obj_floor_fade)) {
 	image_speed = 0;
 	exit;
 }
+
+//Dungeons: changing floors, rooms seen (for the map)
+dungeon_step();
 
 //Pause screen
 if (act_start && state == "idle") {
@@ -60,6 +63,7 @@ act_attack = act_b && global.swordTier > 0 && !swimming && !carrying;
 //	O     = go to the overworld (Haven), in front of Home
 //	I     = go to the item test room
 //	U     = go to the debug room (a section for every item, chests and signs)
+//	T     = go to the Southern Tower's entrance
 if (keyboard_check_pressed(vk_control))	{player_add_health(-1)}
 if (keyboard_check_pressed(ord("H")))	{player_add_health(1)}
 if (keyboard_check_pressed(vk_shift))	{player_add_magic(-4)}
@@ -114,6 +118,11 @@ if (keyboard_check_pressed(ord("O"))) {
 	room_goto(rm_haven);
 	x = 792;
 	y = 840;
+}
+if (keyboard_check_pressed(ord("T"))) {
+	room_goto(rm_southern_tower);
+	x = TOWER_START_X;
+	y = TOWER_START_Y;
 }
 if (keyboard_check_pressed(ord("9"))) {
 	room_goto(rm_test_dungeon);
@@ -177,6 +186,10 @@ player_jump_step();
 player_lift_rocks();
 player_dash_step();
 
+// Hopping down off a ledge with no railing (see the levels script)
+ledge_hop_check();
+ledge_hop_step();
+
 // Carrying a rock: any button throws it
 if (carrying && state == "idle" && (act_a || act_b || act_y)) {
 	player_throw_rock();
@@ -225,8 +238,11 @@ if (state == "hurt") {
 player_pit_check();
 player_fall_step();
 
+// Dropping down from the floor above (see floor_drop)
+floor_land_step();
+
 // Timer01 (the grapple hook, the flute, the boots, jumping and falling end their own states)
-if(state!="idle"&&state!="hook"&&state!="pull"&&state!="flute"&&state!="charge"&&state!="dash"&&state!="jump"&&state!="fall"){
+if(state!="idle"&&state!="hook"&&state!="pull"&&state!="flute"&&state!="charge"&&state!="dash"&&state!="jump"&&state!="fall"&&state!="hop"){
 	if(cnt<dur){cnt++}
 	if(cnt>=dur){state="idle";sprite_index=spr_prev;pose=-1}
 }

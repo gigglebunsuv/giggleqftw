@@ -61,6 +61,38 @@ function chest_open(argument0) {
 
 }
 
+///treasure_hold_up(treasure);
+function treasure_hold_up(argument0) {
+	//Run by obj_link: like opening a chest, but for something lying out (obj_treasure with
+	//hold_up = true, like a boss's heart container): it rises off the floor over his head
+	var t = argument0;
+	state = "itemget";
+	shielding = false;
+	dir = "down";
+	sprite_index = player_get_sprite(dir);
+	pose = LINK_FRAME_RAISE;
+	image_index = pose;
+	image_speed = 0;
+
+	var g = instance_create_depth(x, y, depth - 2, obj_item_get);
+	g.from_x = (t.bbox_left + t.bbox_right + 1) / 2;
+	g.from_y = t.bbox_top + 4;
+	g.item = t.item;
+	g.equip = t.equip;
+	g.tier = t.tier;
+	g.contents = t.contents;
+	g.amount = t.amount;
+	g.message = t.message;
+	with (g) {
+		var icon = treasure_icon();
+		icon_sprite = icon[0];
+		icon_frame = icon[1];
+	}
+	return g;
+
+
+}
+
 ///chest_flag();
 function chest_flag() {
 	//Run by obj_chest: the story flag that remembers it was opened (one per chest, by room and spot)
@@ -90,6 +122,9 @@ function chest_item_name() {
 		case "refill": return "FULL REFILL";
 		case "money": return string(amount) + " MONEY";
 		case "key": return (amount == 1) ? "SMALL KEY" : string(amount) + " SMALL KEYS";
+		case "map": return "DUNGEON MAP";
+		case "compass": return "COMPASS";
+		case "boss_key": return "BOSS KEY";
 	}
 	return "";
 
@@ -130,7 +165,10 @@ function chest_item_desc() {
 		case "bun": return "FIND EVERY PIECE TO OPEN THE WAY TO THE HIDDEN FOREST.";
 		case "refill": return "HEALTH, MAGIC, BOMBS AND ARROWS ARE ALL FULL AGAIN.";
 		case "money": return "SPEND IT IN SHOPS.";
-		case "key": return "OPENS A LOCKED DOOR.";
+		case "key": return "OPENS A LOCKED DOOR. ONLY IN THIS DUNGEON!";
+		case "map": return "SHOWS EVERY ROOM OF THIS DUNGEON ON THE PAUSE SCREEN'S QUEST PAGE.";
+		case "compass": return "THE MAP NOW SHOWS WHERE THE BOSS IS, AND THE CHESTS NOT YET OPENED.";
+		case "boss_key": return "OPENS THE BIG DOOR TO THIS DUNGEON'S BOSS.";
 	}
 	return "";
 

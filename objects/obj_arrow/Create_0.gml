@@ -4,3 +4,4 @@
 sprite_index = spr_arrow;
 speed = 4;
 level = 0;	//set by item_use_bow()
+sfx_play(SFX_ARROW);

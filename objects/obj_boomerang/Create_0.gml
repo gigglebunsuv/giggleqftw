@@ -8,3 +8,4 @@ spd = 4;
 max_dist = 80;	//how far it flies before turning back
 dist = 0;
 level = 0;
+sfx_play(SFX_BOOMERANG);

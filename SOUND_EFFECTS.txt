@@ -1,0 +1,103 @@
+GIGGLE DX - SOUND EFFECTS
+=========================
+
+How to add one: import the sound into the Sounds folder and give it EXACTLY the name in the
+left column. The game looks sounds up by name (scripts/sfx), so nothing else needs changing.
+A sound that isn't imported yet is just skipped, so the game never breaks.
+
+[HAVE]  already imported
+[NEED]  not imported yet
+(demo)  plays in the Southern Tower / dungeon demo
+
+
+PICKING THINGS UP AND FANFARES
+------------------------------
+[NEED] snd_fanfare_item      (demo)  Big item fanfare: the grapple hook, the boss key, any sword,
+                                     shield, armor, gloves, flippers, boots, bomb bag, quiver
+[NEED] snd_fanfare_bun       (demo)  Getting a piece of the Bun (end of a dungeon, the big one)
+[NEED] snd_heart_container   (demo)  Getting a heart container (from the boss)
+[NEED] snd_item_get          (demo)  Small item jingle: map, compass, small keys, money from a
+                                     chest, refills, bottles
+[NEED] snd_chest             (demo)  A chest opening (just before the item rises out)
+[NEED] snd_key               (demo)  A small key appearing when a room is cleared
+[NEED] snd_heart             (demo)  Picking up a heart
+[NEED] snd_money             (demo)  Picking up money
+[NEED] snd_magic             (demo)  Picking up a magic jar
+
+LINK
+----
+[HAVE] sword                 (demo)  Swinging the sword
+[HAVE] snd_player_hurt       (demo)  Link getting hurt
+[HAVE] snd_player_die        (demo)  Link dying
+[HAVE] snd_shield            (demo)  Shield blocking something
+[NEED] snd_hop               (demo)  Hopping down off a ledge
+[NEED] snd_land              (demo)  Landing: after a hop, or dropping through a hole to the
+                                     floor below
+[NEED] snd_fall              (demo)  Falling into a pit
+[NEED] snd_bonk                      Running into a wall with the boots
+[HAVE] snd_dash                      Running boots
+[NEED] snd_jump                      Jumping with the cape
+[NEED] snd_splash                    Getting into deep water
+[NEED] snd_lift                      Lifting a heavy rock
+[NEED] snd_throw                     Throwing a heavy rock
+[NEED] snd_rock              (demo)  A rock breaking (also the Gargoyle's falling rocks)
+
+ITEMS
+-----
+[HAVE] snd_hook_hit          (demo)  The grapple hook catching a post or hitting something
+[NEED] snd_lantern           (demo)  Using the lantern
+[HAVE] snd_torch             (demo)  A torch being lit
+[NEED] snd_arrow                     Shooting an arrow
+[NEED] snd_boomerang                 Throwing the boomerang
+[HAVE] snd_bomb              (demo)  A bomb exploding (also the boss blowing apart)
+[NEED] snd_drink                     Drinking a potion
+[HAVE] snd_fire_rod                  Fire rod
+[HAVE] snd_ice_rod                   Ice rod
+[HAVE] snd_lightning_rod             Lightning rod
+[HAVE] snd_flute                     Flute
+[HAVE] snd_hammer                    Hammer
+[HAVE] snd_dig                       Shovel
+[NEED] snd_cape                      Cape
+[HAVE] snd_mirror                    Mirror
+
+DUNGEONS
+--------
+[HAVE] move_room             (demo)  Taking the stairs to another floor
+[NEED] snd_door              (demo)  A locked door or the boss door opening
+[NEED] snd_shutter           (demo)  A shutter door slamming shut or opening
+[NEED] snd_secret            (demo)  Puzzle solved: all the torches lit, or a switch opening a door
+[NEED] snd_switch            (demo)  Stepping on a floor switch
+[NEED] snd_pot_break         (demo)  A pot smashing
+[NEED] snd_blade_trap        (demo)  A blade trap shooting out
+[NEED] snd_warp              (demo)  Stepping into the warp after the boss
+
+ENEMIES
+-------
+[HAVE] snd_enemy_hit         (demo)  Hitting an enemy
+[HAVE] snd_enemy_die         (demo)  An enemy dying
+[HAVE] snd_enemy_stun        (demo)  Stunning an enemy (grapple hook, boomerang)
+[NEED] snd_guard_alert       (demo)  A guard spotting Link (the "!")
+
+BOSS (THE GARGOYLE)
+-------------------
+[NEED] snd_boss_roar         (demo)  Waking up, and getting yanked down by the grapple hook
+[NEED] snd_wind              (demo)  Its wing gusts
+[NEED] snd_fireball          (demo)  Spitting a fireball
+[NEED] snd_boss_defeat       (demo)  Beaten (plays once, then the explosions)
+
+MENUS AND TEXT
+--------------
+[HAVE] menu_switch           (demo)  Moving the cursor
+[HAVE] menu_select           (demo)  Choosing something
+[HAVE] snd_text              (demo)  Text box letters typing out
+[NEED] snd_pause             (demo)  Opening the pause screen
+
+MUSIC (already imported)
+------------------------
+[HAVE] Title                 Title screen
+[HAVE] DungeonOne            The Southern Tower
+[HAVE] BossTheme             The Gargoyle fight
+
+
+Still NEED for the demo: 27 sounds (the ones marked [NEED] and (demo) above).
+Tip: snd_fanfare_item, snd_fanfare_bun and snd_item_get matter most, since every chest uses one.

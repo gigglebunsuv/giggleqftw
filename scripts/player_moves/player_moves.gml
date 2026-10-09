@@ -107,7 +107,7 @@ function player_animate() {
 		return;
 	}
 	var base = carrying ? LINK_FRAME_CARRY : LINK_FRAME_WALK;
-	if (state == "jump") {
+	if (state == "jump" || state == "hop") {
 		image_index = base + 1;
 		return;
 	}
@@ -268,7 +268,7 @@ function player_land_assist() {
 function player_pit_check() {
 	//Link falls in when his middle has been over a pit (obj_pit) for more than FALL_GRACE steps.
 	//On solid ground away from pits, remembers where he is to come back to after falling.
-	if (state == "jump" || state == "fall" || state == "pull" || state == "dead") return;
+	if (state == "jump" || state == "fall" || state == "pull" || state == "dead" || state == "hop") return;
 	if (position_meeting(x, y, obj_pit)) {
 		fall_grace++;
 		if (fall_grace > FALL_GRACE) {player_fall_start()}
@@ -278,6 +278,7 @@ function player_pit_check() {
 	if (state == "idle" && !swimming && collision_rectangle(x - 8, y - 8, x + 8, y + 8, obj_pit, false, true) == noone) {
 		safe_x = x;
 		safe_y = y;
+		safe_level = level;
 	}
 
 
@@ -299,6 +300,7 @@ function player_fall_start() {
 ///player_fall_step();
 function player_fall_step() {
 	//Shrinks away into the middle of the pit's tile, then comes back where he last stood safely
+	//(or drops to the floor below in a dungeon, see floor_drop)
 	if (state != "fall") return;
 	fall_t++;
 	x += ((x div 16) * 16 + 8 - x) * 0.25;
@@ -307,10 +309,13 @@ function player_fall_step() {
 	image_xscale = s;
 	image_yscale = s;
 	if (fall_t >= FALL_TIME) {
+		//A dungeon floor with a floor under it: he drops down to it instead
+		if (floor_drop()) return;
 		image_xscale = 1;
 		image_yscale = 1;
 		x = safe_x;
 		y = safe_y;
+		if (level_room_uses_levels()) {level_set(safe_level)}
 		move_frac_x = 0;
 		move_frac_y = 0;
 		fall_grace = 0;

@@ -50,7 +50,7 @@ if (idle_steps >= TITLE_IDLE_TIME * game_get_speed(gamespeed_fps)) {
 }
 
 switch (menu) {
-	//Play (straight into the Southern Tower) or Settings
+	//Play (straight into the overworld, in front of Link's house) or Settings
 	case 0:
 		if (menu_move != 0) {
 			cursor = (cursor + menu_move + array_length(main_choices)) mod array_length(main_choices);

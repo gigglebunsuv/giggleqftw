@@ -60,7 +60,7 @@ act_attack = act_b && global.swordTier > 0 && !swimming && !carrying;
 //	B     = get all 5 bottles: red, green, blue potion, fairy, empty
 //	K / L = next bomb / arrow capacity (back to the smallest after the biggest)
 //	9     = go to the test dungeon
-//	O     = go to the overworld (Haven), in front of Home
+//	O     = go to the overworld (rm_overworld), in front of Link's house
 //	I     = go to the item test room
 //	U     = go to the debug room (a section for every item, chests and signs)
 //	T     = go to the Southern Tower's entrance
@@ -115,9 +115,9 @@ if (keyboard_check_pressed(ord("U"))) {
 	y = DEBUG_START_Y;
 }
 if (keyboard_check_pressed(ord("O"))) {
-	room_goto(rm_haven);
-	x = 792;
-	y = 840;
+	room_goto(rm_overworld);
+	x = WORLD_START_X;
+	y = WORLD_START_Y;
 }
 if (keyboard_check_pressed(ord("T"))) {
 	room_goto(rm_southern_tower);

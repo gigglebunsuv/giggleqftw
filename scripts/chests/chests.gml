@@ -118,6 +118,7 @@ function chest_item_name() {
 		case "bomb_bag": return "BIGGER BOMB BAG";
 		case "quiver": return "BIGGER QUIVER";
 		case "heart": return "HEART CONTAINER";
+		case "heart_piece": return "PIECE OF HEART";
 		case "bun": return "PIECE OF THE BUN";
 		case "refill": return "FULL REFILL";
 		case "money": return string(amount) + " MONEY";
@@ -162,6 +163,7 @@ function chest_item_desc() {
 		case "bomb_bag": return "YOU CAN CARRY MORE BOMBS NOW.";
 		case "quiver": return "YOU CAN CARRY MORE ARROWS NOW.";
 		case "heart": return "YOUR LIFE WENT UP BY ONE HEART!";
+		case "heart_piece": return heart_piece_desc();
 		case "bun": return "FIND EVERY PIECE TO OPEN THE WAY TO THE HIDDEN FOREST.";
 		case "refill": return "HEALTH, MAGIC, BOMBS AND ARROWS ARE ALL FULL AGAIN.";
 		case "money": return "SPEND IT IN SHOPS.";

@@ -55,6 +55,9 @@ global.hasFlippers = false;	//passive
 //The Bun, one piece per dungeon
 global.bunPieces = array_create(BUN_PIECES, false);
 
+//Pieces of heart towards the next heart (see heart_piece_collect in the world script)
+global.heartPieces = 0;
+
 //Dungeons: keys, boss keys, maps, compasses (see the dungeon script), and the floor Link's on
 dungeon_init();
 cur_floor = noone;

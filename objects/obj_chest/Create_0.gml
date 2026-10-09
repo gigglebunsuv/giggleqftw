@@ -7,6 +7,7 @@
 //	equip = "boots";						"gloves", "flippers", "boots"
 //	equip = "bottle"; contents = BOTTLE.RED;	a bottle (or fills an empty one if all 5 are owned)
 //	equip = "bomb_bag";						"bomb_bag", "quiver" (next capacity), "heart" (container),
+//											"heart_piece" (a piece of heart, see the world script),
 //											"bun" (next Bun piece), "refill" (health, magic, bombs, arrows)
 //	equip = "money"; amount = 50;			money, or "key" for small keys (amount = how many)
 //Nothing set = an empty chest. Also:

@@ -10,6 +10,8 @@ if (life <= 0) {
 if (kind == SHOT.LANTERN || kind == SHOT.FIRE) {
 	var torch = instance_place(x, y, obj_torch);
 	if (torch != noone) {torch_light(torch)}
+	var cut = instance_place(x, y, obj_bush);
+	if (cut != noone) {with (cut) {bush_cut()}}
 	var bush = instance_place(x, y, obj_bush_grass);
 	if (bush != noone) {with (bush) {instance_destroy()}}
 	var grass = instance_place(x, y, obj_tallgrass_grass);

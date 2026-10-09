@@ -5,9 +5,9 @@
 //onto the boss's room until the boss is beaten (boss_music_step).
 //Set those in the instance's Creation Code.
 
-exit_room = rm_haven;
-exit_x = 792;
-exit_y = 840;
+exit_room = rm_overworld;	//out in front of the Southern Tower's door
+exit_x = WORLD_TOWER_X;
+exit_y = WORLD_TOWER_Y;
 music = BossTheme;
 room_music = DungeonOne;
 music_on = false;
@@ -15,4 +15,3 @@ resume_music = false;	//the boss was beaten: the dungeon's music comes back afte
 checked = false;
 rewards_out = false;
 portal_out = false;
-thanks_timer = 0;	//dungeon demo: counts up to the thank-you screen (rm_thanks) once the Bun is got

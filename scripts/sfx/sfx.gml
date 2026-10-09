@@ -58,6 +58,7 @@
 #macro SFX_BOSS_DEFEAT "snd_boss_defeat"	//the boss beaten (before it blows apart)
 #macro SFX_WARP "snd_warp"	//stepping into a warp
 #macro SFX_PAUSE "snd_pause"	//opening the pause screen
+#macro SFX_BUSH "snd_bush"	//cutting a bush
 
 ///sfx_play(name);
 function sfx_play(argument0) {

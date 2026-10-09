@@ -1,10 +1,10 @@
-/// @description Title screen (dungeon demo): Play or Settings
+/// @description Title screen (overworld demo): Play or Settings
 //menu: 0 the main choices, 2 the Options screen (options_menu script).
 //Play: the room, where Link starts in it, and the function that gives him his starting items.
-//Picking it makes Link (persistent) here and sends him to the Southern Tower.
+//Picking it makes Link (persistent) here and sends him to the overworld, in front of his house.
 
 main_choices = ["PLAY", "SETTINGS"];
-play_choice = ["SOUTHERN TOWER", rm_southern_tower, TOWER_START_X, TOWER_START_Y, dungeon_start_southern_tower];
+play_choice = ["HAVEN", rm_overworld, WORLD_START_X, WORLD_START_Y, world_start_new_game];
 menu = 0;
 cursor = 0;
 options_open(16);	//the Options box fills the window (200 tall: 16 lines of controls)

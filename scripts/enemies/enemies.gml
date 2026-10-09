@@ -13,6 +13,8 @@
 function enemy_is_active() {
 	//Enemies only move while Link is in their camera zone, and wait during a slide
 	if (global.cam_transition || instance_exists(obj_floor_fade)) return false;
+	//The overworld: only near the screen too (see world_enemy_awake)
+	if (instance_exists(obj_world)) return world_enemy_awake();
 	var z = global.cam_zone;
 	if (z == noone || !instance_exists(z)) return true;
 	return point_in_rectangle(x, y, z.bbox_left, z.bbox_top, z.bbox_right, z.bbox_bottom);

@@ -1,0 +1,1 @@
+dialogue = "THE OLD WELL. IT WENT DRY YEARS AGO.";

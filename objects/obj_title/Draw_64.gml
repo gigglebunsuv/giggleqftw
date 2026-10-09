@@ -1,4 +1,4 @@
-/// @description Story crawl, title art and logo, "DUNGEON DEMO", the choices in the field (or the Options screen), the studio name
+/// @description Story crawl, title art and logo, "OVERWORLD DEMO", the choices in the field (or the Options screen), the studio name
 
 //Fills the whole window (256x208, the same size as the HUD bar + play area in the game).
 //spr_title_bg and spr_title_logo are stretched to it, so draw them at 256x208.
@@ -27,12 +27,12 @@ if (sprite_exists(logo)) {
 }
 if (intro == 2) {exit}
 
-//"DUNGEON DEMO" under the logo, on a dark band so it reads over the art
+//"OVERWORLD DEMO" under the logo, on a dark band so it reads over the art
 draw_set_font(menu_font);
 draw_set_valign(fa_top);
 draw_set_halign(fa_center);
-draw_sprite_ext(spr_pixel, 0, gw div 2 - 58, TITLE_DEMO_Y - 3, 116, 14, 0, c_black, 0.55);
-menu_draw_text_colour(gw div 2, TITLE_DEMO_Y, "DUNGEON DEMO", MENU_COL_CURSOR);
+draw_sprite_ext(spr_pixel, 0, gw div 2 - 66, TITLE_DEMO_Y - 3, 132, 14, 0, c_black, 0.55);
+menu_draw_text_colour(gw div 2, TITLE_DEMO_Y, "OVERWORLD DEMO", MENU_COL_CURSOR);
 draw_set_halign(fa_left);
 
 //Options screen: a box over the whole window (options_menu script)

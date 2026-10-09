@@ -14,10 +14,13 @@ if (!rewards_out) {
 	rewards_out = true;
 	boss_rewards_spawn();
 }
+//Dungeon demo: no warp out. Once the Bun's text box is closed, on to the thank-you screen.
 if (!portal_out && flag_get(boss_reward_flag(global.dungeon, "bun"))) {
-	portal_out = true;
-	var p = instance_create_depth(x - 8, y - 8, DEPTH_DECOR, obj_warp_portal);
-	p.targetRoom = exit_room;
-	p.targetX = exit_x;
-	p.targetY = exit_y;
+	if (instance_exists(obj_link) && obj_link.state == "idle" && !instance_exists(obj_dialogue) && !instance_exists(obj_item_get)) {
+		thanks_timer++;
+		if (thanks_timer >= THANKS_DELAY) {
+			portal_out = true;
+			room_goto(rm_thanks);
+		}
+	}
 }

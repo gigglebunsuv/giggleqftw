@@ -18,6 +18,9 @@
 #macro DROP_TIME 14				//steps that takes
 #macro TOWER_START_X 1792		//the Southern Tower's entrance (1F, the entrance hall's front door)
 #macro TOWER_START_Y 680
+#macro THANKS_DELAY 40			//dungeon demo: steps after the Bun's text box closes before the thank-you screen
+#macro THANKS_WAIT 90			//steps on the thank-you screen before a button goes back to the title
+#macro THANKS_FADE 30			//steps to fade the thank-you screen in and out
 
 ///dungeon_init();
 function dungeon_init() {
@@ -444,7 +447,7 @@ function boss_rewards_spawn() {
 		b.equip = "bun";
 		b.hold_up = true;
 		b.flag = boss_reward_flag(d, "bun");
-		b.message = "THE BUN GLOWS WARMLY. A WAY OUT HAS OPENED IN THE MIDDLE OF THE ROOF.";
+		b.message = "THE BUN GLOWS WARMLY. THE SOUTHERN TOWER IS FREE!";
 	}
 	sfx_play(SFX_ITEM_GET);
 

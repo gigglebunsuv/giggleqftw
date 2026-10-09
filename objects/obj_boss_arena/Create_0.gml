@@ -15,3 +15,4 @@ resume_music = false;	//the boss was beaten: the dungeon's music comes back afte
 checked = false;
 rewards_out = false;
 portal_out = false;
+thanks_timer = 0;	//dungeon demo: counts up to the thank-you screen (rm_thanks) once the Bun is got

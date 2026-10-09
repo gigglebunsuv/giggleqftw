@@ -1,4 +1,4 @@
-/// @description Story crawl and title reveal, then the main choices, level select and options, or replay the intro when left alone
+/// @description Story crawl and title reveal, then Play or Settings, or replay the intro when left alone
 
 //Window and GUI size, like the rooms with the HUD. obj_hud_main (persistent) sets them up
 //and draws the game in the window (the view is centred here, see hud_play_area_window)
@@ -40,7 +40,7 @@ if (intro < 3) {
 	exit;	//the button that skipped doesn't also pick a choice
 }
 
-//Left alone on the main choices or level select: play the story and reveal again
+//Left alone on the main choices: play the story and reveal again
 //(not on the Options screen, so there's time to read the controls)
 idle_steps += 1;
 if (skip || act_b || menu_move != 0 || menu_move_h != 0 || menu == 2) {idle_steps = 0}
@@ -50,7 +50,7 @@ if (idle_steps >= TITLE_IDLE_TIME * game_get_speed(gamespeed_fps)) {
 }
 
 switch (menu) {
-	//Level select or options
+	//Play (straight into the Southern Tower) or Settings
 	case 0:
 		if (menu_move != 0) {
 			cursor = (cursor + menu_move + array_length(main_choices)) mod array_length(main_choices);
@@ -59,37 +59,17 @@ switch (menu) {
 		if (skip) {
 			audio_play_sound(menu_select, 3, false);
 			if (cursor == 0) {
-				menu = 1;
-				cursor = 0;
+				var c = play_choice;
+				if (!instance_exists(obj_link)) {instance_create_depth(c[2], c[3], 0, obj_link)}
+				obj_link.x = c[2];
+				obj_link.y = c[3];
+				script_execute(c[4]);
+				global.pause_block = true;	//so Link ignores the button that started the game
+				room_goto(c[1]);
 			} else {
 				menu = 2;
 				options_open(opt_rows);
 			}
-		}
-		break;
-
-	//Level select: B goes back
-	case 1:
-		if (act_b) {
-			menu = 0;
-			cursor = 0;
-			audio_play_sound(menu_switch, 2, false);
-			break;
-		}
-		var n = array_length(level_choices);
-		if (menu_move != 0) {
-			cursor = (cursor + menu_move + n) mod n;
-			audio_play_sound(menu_switch, 2, false);
-		}
-		if (skip) {
-			audio_play_sound(menu_select, 3, false);
-			var c = level_choices[cursor];
-			if (!instance_exists(obj_link)) {instance_create_depth(c[2], c[3], 0, obj_link)}
-			obj_link.x = c[2];
-			obj_link.y = c[3];
-			if (array_length(c) > 4) {script_execute(c[4])}
-			global.pause_block = true;	//so Link ignores the button that started the game
-			room_goto(c[1]);
 		}
 		break;
 

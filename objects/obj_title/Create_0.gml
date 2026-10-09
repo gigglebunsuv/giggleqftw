@@ -1,18 +1,10 @@
-/// @description Title screen: level select or options
-//menu: 0 the main choices, 1 level select, 2 the Options screen (options_menu script).
-//Level select: the name shown, the room, and where Link starts in it.
-//Picking one makes Link (persistent) here and sends him to that room. An optional fifth entry
-//is a function run once Link is made (the items he starts with there).
+/// @description Title screen (dungeon demo): Play or Settings
+//menu: 0 the main choices, 2 the Options screen (options_menu script).
+//Play: the room, where Link starts in it, and the function that gives him his starting items.
+//Picking it makes Link (persistent) here and sends him to the Southern Tower.
 
-main_choices = ["LEVEL SELECT", "OPTIONS"];
-level_choices = [
-	["HAVEN", rm_haven, 792, 840],
-	["SOUTHERN TOWER", rm_southern_tower, TOWER_START_X, TOWER_START_Y, dungeon_start_southern_tower],
-	["TEST DUNGEON", rm_test_dungeon, 384, 640],
-	["DEBUG ROOM", rm_debug, 640, 120]
-];
-level_names = [];
-for (var i = 0; i < array_length(level_choices); i++) {level_names[i] = level_choices[i][0]}
+main_choices = ["PLAY", "SETTINGS"];
+play_choice = ["SOUTHERN TOWER", rm_southern_tower, TOWER_START_X, TOWER_START_Y, dungeon_start_southern_tower];
 menu = 0;
 cursor = 0;
 options_open(16);	//the Options box fills the window (200 tall: 16 lines of controls)

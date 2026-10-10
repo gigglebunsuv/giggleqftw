@@ -26,7 +26,7 @@ grid = item_grid();	//which item is in each slot
 cursor = max(0, item_grid_slot(global.itemA));	//start on the equipped item
 
 //Settings page
-set_choices = ["RESUME", "SAVE AND CONTINUE", "SAVE AND QUIT", "OPTIONS", "MAIN MENU"];
+set_choices = ["RESUME", "OPTIONS", "MAIN MENU"];	//dungeon demo: no save file, so no saving
 set_cursor = 0;
 save_msg = "";		//"SAVED" (or "NO SAVE FILE") under the choices for a moment
 save_msg_timer = 0;

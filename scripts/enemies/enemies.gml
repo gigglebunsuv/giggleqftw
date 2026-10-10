@@ -70,6 +70,7 @@ function enemy_hurt(argument0, argument1, argument2, argument3) {
 			if (hp <= 0) {
 				instance_create_depth(x, y, depth - 1, obj_enemy_death);
 				sfx_play(SFX_ENEMY_DIE);
+				global.demo_kills++;	//the dungeon demo's thank-you screen (demo script)
 				if (drops) {enemy_drop(x, y)}
 				instance_destroy();
 			} else {

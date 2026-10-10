@@ -11,6 +11,7 @@
 #macro TITLE_MENU_X 172			//middle of the title choices (in the field right of the cliff)
 #macro TITLE_MENU_Y 128			//top of the title choices
 #macro TITLE_DEBUG_Y 24			//top of the Debug list (13 places: starts near the top so it all fits)
+#macro TITLE_DEMO_Y 68			//"DUNGEON DEMO", under the logo
 #macro TITLE_IDLE_TIME 30		//seconds on the menu with no button pressed before the intro plays again
 
 ///title_intro_start();

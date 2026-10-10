@@ -11,7 +11,7 @@
 //"act" (A does it), "warp" (A goes there: arg is [room, x, y]) or "info" (shown, not changed).
 //debug_get / debug_put read and change a row's value by its id; debug_num_range gives a number's limits.
 
-#macro DEBUG_MENU true
+#macro DEBUG_MENU false	//dungeon demo: no debug menu
 #macro DEBUG_PAGES 8
 #macro DEBUG_ROWS_SHOWN 14
 

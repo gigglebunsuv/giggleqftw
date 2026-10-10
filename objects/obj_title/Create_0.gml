@@ -1,39 +1,10 @@
-/// @description Title screen: Play, Settings, Debug
-//menu: 0 the main choices, 1 the Debug list, 2 the Options screen (options_menu script),
-//3-6 the file select and name entry (file_select script).
-//PLAY: the three save files (save_files script). DEBUG: start anywhere with a set of items, no save file.
-//Debug list: the name shown, the room, and where Link starts in it. An optional fifth entry
-//is a function run once Link is made (the items he starts with there).
+/// @description Title screen (dungeon demo): Play or Settings
+//menu: 0 the main choices, 2 the Options screen (options_menu script).
+//PLAY: straight into the Southern Tower with the demo's items, no save file (demo_start, demo script).
 
-main_choices = ["PLAY", "SETTINGS", "DEBUG"];
-debug_choices = [
-	["OVERWORLD", rm_overworld, WORLD_START_X, WORLD_START_Y, world_start_new_game],
-	["SOUTHERN TOWER", rm_southern_tower, TOWER_START_X, TOWER_START_Y, dungeon_start_southern_tower],
-	["BOG TOWER", rm_bog_tower, BOG_START_X, BOG_START_Y, dungeon_start_bog_tower],
-	["LADHELLIN", rm_ladhellin_tower, LADHELLIN_START_X, LADHELLIN_START_Y, dungeon_start_ladhellin],
-	["CASTLE", rm_castle, CASTLE_START_X, CASTLE_START_Y, dungeon_start_castle],
-	["ARCANUM: FLAME", rm_arcanum, ARCANUM_START_X, ARCANUM_START_Y, function() {dungeon_start_arcanum(1)}],
-	["ARCANUM: FROST", rm_arcanum, ARCANUM_START_X, ARCANUM_START_Y, function() {dungeon_start_arcanum(2)}],
-	["ARCANUM: STORM", rm_arcanum, ARCANUM_START_X, ARCANUM_START_Y, function() {dungeon_start_arcanum(3)}],
-	["HALL OF ECHOES", rm_interiors, ECHOES_X, ECHOES_Y, function() {dungeon_start_castle(); flag_set(GAME_CLEAR_FLAG, true); flag_set(boss_flag(1), true); flag_set(boss_flag(2), true); flag_set(boss_flag(3), true);}],
-	["TEST DUNGEON", rm_test_dungeon, 384, 640],
-	["DEBUG ROOM", rm_debug, DEBUG_START_X, DEBUG_START_Y],
-	["ITEM TEST", rm_item_test, 264, 184],
-	["HAVEN", rm_haven, 792, 840]
-];
-debug_names = [];
-for (var i = 0; i < array_length(debug_choices); i++) {debug_names[i] = debug_choices[i][0]}
+main_choices = ["PLAY", "SETTINGS"];
 menu = 0;
 cursor = 0;
-fs_cursor = 0;		//file select: the file picked
-fs_action = 0;		//0 START, 1 ERASE
-fs_confirm = 0;		//erase? 0 NO, 1 YES
-fs_slots = [];
-name_text = "";		//name entry
-fs_name = "";		//the name, on the NORMAL / HERO screen
-fs_hero = 0;		//0 NORMAL, 1 HERO
-name_col = 0;
-name_row = 0;
 options_open(16);	//the Options box fills the window (200 tall: 16 lines of controls)
 menu_font = font_add_sprite_ext(spr_menu_font, " ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-:!?.'/", false, 0);
 small_font = font_add_sprite_ext(spr_font_small, " ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-:!?.'/", false, 0);

@@ -145,10 +145,8 @@ function input_bind_list() {
 		[3, "DASH: HOLD RUN AND STEER."],
 		[3, "LET GO TO STOP."],
 		[3, "TALK: FACE THEM AND PRESS A."],
-		[3, "SIGNS AND CHESTS TOO."],
-		[0, "DEBUG"],
-		[1, "DEBUG MENU", "F1", "SELECT"]
-	];
+		[3, "SIGNS AND CHESTS TOO."]
+	];	//dungeon demo: no debug menu row
 
 
 }

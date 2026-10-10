@@ -574,6 +574,7 @@
     {"id":{"name":"obj_cutscene","path":"objects/obj_cutscene/obj_cutscene.yy",},},
     {"id":{"name":"ShopTheme","path":"sounds/ShopTheme/ShopTheme.yy",},},
     {"id":{"name":"game_feel","path":"scripts/game_feel/game_feel.yy",},},
+    {"id":{"name":"demo","path":"scripts/demo/demo.yy",},},
     {"id":{"name":"spr_sword_beam","path":"sprites/spr_sword_beam/spr_sword_beam.yy",},},
     {"id":{"name":"obj_sword_beam","path":"objects/obj_sword_beam/obj_sword_beam.yy",},},
     {"id":{"name":"bun_pedestal","path":"scripts/bun_pedestal/bun_pedestal.yy",},},

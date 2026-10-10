@@ -62,7 +62,8 @@ function pause_step_settings() {
 	}
 
 	//Resume, Save and continue, Save and quit (to the title), Options, Main menu
-	//(A twice: starts the whole game again from the title, without saving)
+	//(A twice: starts the whole game again from the title, without saving).
+	//Picked by name: the dungeon demo leaves the save choices out (obj_pause_menu's Create).
 	if (save_msg_timer > 0) {save_msg_timer--}
 	if (menu_move != 0) {
 		set_cursor = (set_cursor + menu_move + array_length(set_choices)) mod array_length(set_choices);
@@ -70,12 +71,13 @@ function pause_step_settings() {
 		audio_play_sound(menu_switch, 2, false);
 	}
 	if (!act_a) return;
-	switch (set_cursor) {
-		case 0:
+	var pick = set_choices[set_cursor];
+	switch (pick) {
+		case "RESUME":
 			pause_close();
 			break;
-		case 1:
-		case 2:
+		case "SAVE AND CONTINUE":
+		case "SAVE AND QUIT":
 			//Save to this game's file (save_files script). Games from the DEBUG menu have none.
 			confirm_quit = false;
 			save_msg_timer = 60;
@@ -86,17 +88,17 @@ function pause_step_settings() {
 			}
 			save_msg = "SAVED";
 			audio_play_sound(menu_select, 3, false);
-			if (set_cursor == 2) {
+			if (pick == "SAVE AND QUIT") {
 				instance_activate_all();
 				game_restart();	//the title screen is the first room
 			}
 			break;
-		case 3:
+		case "OPTIONS":
 			show_options = true;
 			options_open((page_h - 40) div 10);
 			audio_play_sound(menu_select, 3, false);
 			break;
-		case 4:
+		case "MAIN MENU":
 			if (confirm_quit) {
 				audio_play_sound(menu_select, 3, false);
 				instance_activate_all();

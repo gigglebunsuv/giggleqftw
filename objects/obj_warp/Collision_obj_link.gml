@@ -5,5 +5,7 @@ if (instance_exists(obj_dialogue) || instance_exists(obj_item_get)) exit;
 if (obj_link.state == "itemget" || obj_link.state == "talk" || obj_link.state == "dead") exit;
 //Already fading out through this warp (or another): see the room_fade script
 if (instance_exists(obj_room_fade)) exit;
+//Dungeon demo: the way out to the overworld is closed (see the demo script)
+if (demo_door_blocked(id)) exit;
 sfx_play(SFX_WARP);
 room_fade_start(targetRoom, targetX, targetY, object_index == obj_warp_portal);

@@ -2,6 +2,7 @@
 //One hit pops it. master is the real Sphinx.
 
 event_inherited();
+drops = false;
 hp = 1;
 contact_damage = 0;
 kb_speed = 0;

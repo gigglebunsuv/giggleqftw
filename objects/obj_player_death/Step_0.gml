@@ -28,7 +28,9 @@ if (phase == "spin") {
 		var pick = choices[cursor];
 		if (pick == "CONTINUE") {
 			//CONTINUE: restart this room from where Link came in, with a few hearts
+			//(in the Hall of Echoes' rush: back in the Hall, see rush_fail_continue)
 			global.pHealth = min(continue_hearts * 2, global.pHealthMax);
+			if (rush_fail_continue()) exit;
 			with (obj_link) {
 				state = "idle";
 				hurt_timer = 0;

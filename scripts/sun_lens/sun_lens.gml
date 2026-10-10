@@ -19,7 +19,7 @@
 ///lens_is_held();
 function lens_is_held() {
 	//Run by obj_link after input_get: is the button the Sun Lens is on being held?
-	return (global.itemA == ITEM.LENS && hold_a) || (global.itemY == ITEM.LENS && hold_y);
+	return item_button_held(ITEM.LENS);
 
 
 }

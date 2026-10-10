@@ -1,6 +1,6 @@
 //The pause screen's pages. Run by obj_pause_menu (its Step and Draw GUI events).
 //[ and ] (LB and RB) switch pages:
-//	0 ITEMS		the item grid (put items on A or Y), the buttons, preassigned equipment (sword, boots)
+//	0 ITEMS		the item grid (put items on A, Y or X), the buttons, preassigned equipment (sword, boots)
 //	1 QUEST		passive equipment (gloves, armor, flippers), The Bun, the map of this room
 //				(in a dungeon: one floor at a time, up/down for the others, see the dungeon_map script)
 //	2 SETTINGS	resume, save (save_files script), options (the controls list, the volume: options_menu script),
@@ -41,11 +41,12 @@ function pause_step_items() {
 		audio_play_sound(menu_switch, 2, false);
 	}
 
-	//Put the item under the cursor on A or Y (swaps if it's on the other one)
+	//Put the item under the cursor on A, Y or X (swaps if it's on another one)
 	var sel = grid[cursor];
-	if ((act_a || act_y) && sel != ITEM.NONE && global.item_have[sel]) {
+	if ((act_a || act_y || act_x) && sel != ITEM.NONE && global.item_have[sel]) {
 		if (act_a) {item_equip(sel, 0)}
-		else {item_equip(sel, 1)}
+		else if (act_y) {item_equip(sel, 1)}
+		else {item_equip(sel, 2)}
 		audio_play_sound(menu_select, 3, false);
 	}
 
@@ -173,12 +174,15 @@ function pause_draw_items() {
 		var it = grid[i];
 		if (it != ITEM.NONE && global.item_have[it]) {
 			draw_sprite(item_get_sprite(it), item_get_frame(it), sx + (cell - 16) div 2, sy + (cell - 16) div 2);
-			//Small A / Y glyph on the equipped items (A bottom right, Y bottom left)
+			//Small A / Y / X glyph on the equipped items (A bottom right, Y bottom left, X top left)
 			if (it == global.itemA) {
-				draw_sprite(spr_hud_glyph, 0 + pad, sx + cell - gl_w, sy + cell - gl_h);
+				hud_draw_glyph(0, sx + cell - gl_w, sy + cell - gl_h);
 			}
 			if (it == global.itemY) {
-				draw_sprite(spr_hud_glyph, 2 + pad, sx, sy + cell - gl_h);
+				hud_draw_glyph(2, sx, sy + cell - gl_h);
+			}
+			if (it == global.itemX) {
+				hud_draw_glyph(3, sx, sy);
 			}
 		}
 	}
@@ -198,18 +202,19 @@ function pause_draw_items() {
 		draw_set_halign(fa_left);
 	}
 
-	//--- Buttons: what's on Y, B and A right now (same boxes as the HUD)
+	//--- Buttons: what's on X, Y, B and A right now (same boxes as the HUD)
 	menu_draw_box(side_x, page_y, side_w, 46);
 	draw_set_halign(fa_center);
 	menu_draw_text(side_x + side_w div 2, page_y + 5, "BUTTONS");
 	draw_set_halign(fa_left);
 	var sw = sprite_get_width(spr_hud_slot);
-	var bx = side_x + (side_w - sw * 3 - 8) div 2;
+	var bx = side_x + (side_w - sw * 4 - 12) div 2;
 	var sword_spr = -1;
 	if (global.swordTier > 0) {sword_spr = spr_menu_sword}
-	hud_draw_button(bx, page_y + 16, 2, item_get_sprite(global.itemY), item_get_frame(global.itemY));
-	hud_draw_button(bx + sw + 4, page_y + 16, 1, sword_spr, global.swordTier - 1);
-	hud_draw_button(bx + (sw + 4) * 2, page_y + 16, 0, item_get_sprite(global.itemA), item_get_frame(global.itemA));
+	hud_draw_button(bx, page_y + 16, 3, item_get_sprite(global.itemX), item_get_frame(global.itemX));
+	hud_draw_button(bx + sw + 4, page_y + 16, 2, item_get_sprite(global.itemY), item_get_frame(global.itemY));
+	hud_draw_button(bx + (sw + 4) * 2, page_y + 16, 1, sword_spr, global.swordTier - 1);
+	hud_draw_button(bx + (sw + 4) * 3, page_y + 16, 0, item_get_sprite(global.itemA), item_get_frame(global.itemA));
 
 	//--- Preassigned equipment: sword (always on B, by tier), running boots (run button)
 	var pre_y = page_y + 50;
@@ -224,15 +229,15 @@ function pause_draw_items() {
 	var hint_y = pre_y + 44;
 	var hint_h = page_y + page_h - hint_y;
 	menu_draw_box(side_x, hint_y, side_w, hint_h);
-	var ty = hint_y + 10;
-	draw_sprite(spr_hud_glyph, 0 + pad, side_x + 8, ty - 1);
-	menu_draw_text(side_x + 20, ty, "EQUIP");
-	draw_sprite(spr_hud_glyph, 2 + pad, side_x + 8, ty + 15);
-	menu_draw_text(side_x + 20, ty + 16, "EQUIP");
+	var ty = hint_y + 8;
+	hud_draw_glyph(0, side_x + 8, ty - 1);
+	hud_draw_glyph(2, side_x + 20, ty - 1);
+	hud_draw_glyph(3, side_x + 32, ty - 1);
+	menu_draw_text(side_x + 44, ty, "EQUIP");
 	var close_str = "ENTER: CLOSE";
 	if (global.input_using_pad) {close_str = "START: CLOSE"}
-	menu_draw_text(side_x + 8, ty + 32, close_str);
-	pause_draw_page_hint(side_x + 8, ty + 48);
+	menu_draw_text(side_x + 8, ty + 16, close_str);
+	pause_draw_page_hint(side_x + 8, ty + 32);
 
 
 }
@@ -242,11 +247,19 @@ function pause_draw_quest() {
 	var gw = display_get_gui_width();
 	var half_w = (gw - 12) div 2;
 
-	//--- Passive equipment: strength gloves, armor (by tier), flippers. Always on.
-	var pas_spr = [spr_menu_gloves, spr_menu_armor, spr_menu_flippers];
-	var pas_frame = [0, global.armorTier - 1, 0];
-	var pas_have = [global.hasGloves, global.armorTier > 0, global.hasFlippers];
-	menu_draw_equipment(4, page_y, half_w, 40, "PASSIVE", pas_spr, pas_frame, pas_have);
+	//--- Passive equipment: strength gloves, armor (by tier, or the bunny tunic over it), flippers,
+	//the Echo Charm. Always on. A puts the bunny tunic on or takes it off (see the bunlings script).
+	var armor_spr = tunic_worn() ? spr_menu_tunic : spr_menu_armor;
+	var armor_frame = tunic_worn() ? 0 : global.armorTier - 1;
+	var pas_spr = [spr_menu_gloves, armor_spr, spr_menu_flippers, spr_echo_charm];
+	var pas_frame = [0, armor_frame, 0, 0];
+	var pas_have = [global.hasGloves, global.armorTier > 0, global.hasFlippers, flag_get(ECHO_CHARM_FLAG)];
+	var pas_x = menu_draw_equipment(4, page_y, half_w, 40, "PASSIVE", pas_spr, pas_frame, pas_have);
+	//An A glyph on the armor slot's corner once there's a tunic to put on
+	if (flag_get(TUNIC_FLAG)) {
+		var gl = sprite_get_width(spr_hud_glyph);
+		hud_draw_glyph(0, pas_x + MENU_EQUIP_SLOT + MENU_EQUIP_GAP + MENU_EQUIP_SLOT - gl + 3, page_y + MENU_EQUIP_TOP + MENU_EQUIP_SLOT - gl + 1);
+	}
 
 	//--- The Bun
 	var bun_box_x = 8 + half_w;

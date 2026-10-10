@@ -98,7 +98,9 @@ switch (menu) {
 			var c = debug_choices[cursor];
 			save_start_link(c[2], c[3]);
 			save_debug_game();
-			if (array_length(c) > 4) {script_execute(c[4])}
+			if (array_length(c) > 4) {
+				if (is_method(c[4])) {c[4]()} else {script_execute(c[4])}
+			}
 			global.pause_block = true;	//so Link ignores the button that started the game
 			room_goto(c[1]);
 		}

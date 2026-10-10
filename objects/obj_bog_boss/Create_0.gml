@@ -3,6 +3,8 @@
 //(boss_object = obj_bog_boss; in the arena's Creation Code). Only arrows hurt it.
 
 event_inherited();
+is_boss = true;	//longer hitstop, a shake, no drops (see enemy_hurt)
+drops = false;
 hp = BOGB_HP;
 hp_max = BOGB_HP;
 hp_last = hp;

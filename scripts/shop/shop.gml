@@ -86,8 +86,11 @@ function shop_goods_list(argument0) {
 					sold: function() {return flag_get("shop_bombs_bottle")}, flag: "shop_bombs_bottle"},
 			];
 		case "armor":
-			//The armorer (see the armorer script): chain-mail after the Bog Tower, golden armor after Ladhellin
+			//The armorer (see the armorer script): chain-mail and the big shield after the Bog Tower, golden armor after Ladhellin
 			return [
+				{name: "BIG SHIELD", price: SHIELD_PRICE_2, give: {equip: "shield", tier: 2}, after: 2,
+					desc: "COVERS MORE OF YOU, AND HOLDS OFF A WIZARD'S MAGIC.",
+					sold: function() {return global.shieldTier >= 2}},
 				{name: "LEVEL 2 ARMOR", price: ARMOR_PRICE_2, give: {equip: "armor", tier: 2}, after: 2,
 					desc: "BLUE CHAIN-MAIL. ENEMIES DO HALF THE DAMAGE.",
 					sold: function() {return global.armorTier >= 2}},
@@ -204,6 +207,7 @@ function shop_icon(argument0) {
 		case "arrow_refill": return [spr_arrow_bundle, 0];
 		case "quiver": return [spr_item_bow, 0];
 		case "armor": return [spr_menu_armor, clamp(give.tier, 1, ARMOR_TIER_MAX) - 1];
+		case "shield": return [spr_menu_shield, clamp(give.tier, 1, SHIELD_TIER_MAX) - 1];
 	}
 	return [-1, 0];
 

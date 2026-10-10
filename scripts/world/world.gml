@@ -81,8 +81,11 @@ function world_music_play(argument0) {
 	if (argument0 == -1) return;
 	if (variable_global_exists("world_music") && global.world_music == argument0 && audio_is_playing(argument0)) return;
 	//Stop the other music (not the sound effects)
-	var tracks = [Overworld, Village, DungeonOne, BogTower, LadhellinTower, BossTheme, House, ShopTheme, Intro, Title, FileSelect];
+	var tracks = [Overworld, Village, DungeonOne, BogTower, LadhellinTower, BossTheme, House, ShopTheme, Intro, Title, FileSelect,
+		CastleTheme, FinalBossTheme, EndingTheme, ArcanumTheme];
 	for (var i = 0; i < array_length(tracks); i++) {audio_stop_sound(tracks[i])}
+	//...and whatever was last put on as the music, in case it isn't in that list
+	if (variable_global_exists("world_music") && audio_exists(global.world_music)) {audio_stop_sound(global.world_music)}
 	audio_play_sound(argument0, 1, true);
 	global.world_music = argument0;
 
@@ -229,6 +232,19 @@ function world_gate_open_now() {
 			return false;
 		case "flag":
 			return flag_get(open_flag);
+		case "lightning":
+			//only the lightning rod's bolt opens it (see rod_shot_tricks): a sword just sparks off the iron
+			if (instance_exists(obj_sword) && place_meeting(x, y, obj_sword) && clink_timer <= 0) {
+				sfx_play(SFX_SHIELD);
+				sfx_play(SFX_ZAP);
+				clink_timer = 20;
+				//The first strike each visit says what it wants
+				if (!told) {
+					told = true;
+					dialogue_start(["ZAP! THE IRON BARS CRACKLE AND SPIT SPARKS. A BOLT IS STAMPED ON THE LOCK. ONLY LIGHTNING WILL MOVE THIS GATE."]);
+				}
+			}
+			return false;
 	}
 	return false;
 

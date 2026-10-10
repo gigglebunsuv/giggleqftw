@@ -4,6 +4,9 @@ sfx_play(SFX_PAUSE);
 
 //The map needs Link and the camera zones, so take it before everything is deactivated
 map = menu_map_build();
+//Where Link is, for the debug menu (he's deactivated with everything else)
+link_x = instance_exists(obj_link) ? obj_link.x : 0;
+link_y = instance_exists(obj_link) ? obj_link.y : 0;
 instance_deactivate_all(true);
 
 menu_font = font_add_sprite_ext(spr_menu_font, " ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-:!?.'/", false, 0);
@@ -40,3 +43,10 @@ grid_y = page_y + 18;
 side_x = 140;	//items page: right column (wide enough for 13 letters)
 side_w = 112;
 options_open((page_h - 40) div 10);
+
+//The debug menu (F1 / Select, see the debug_menu script): the same frozen screen, its own pages
+debug = false;
+if (global.debug_menu_request) {
+	global.debug_menu_request = false;
+	debug_menu_open();
+}

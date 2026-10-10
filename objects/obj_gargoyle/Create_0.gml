@@ -2,6 +2,8 @@
 //Place it on the pillar it sleeps on. The roof needs an obj_boss_arena in the middle.
 
 event_inherited();
+is_boss = true;	//longer hitstop, a shake, no drops (see enemy_hurt)
+drops = false;
 hp = GARG_HP;
 hp_max = GARG_HP;
 level = -1;			//flying: over pits and walls

@@ -4,12 +4,15 @@ if (!menu) {
 	timer--;
 	if (timer > 0) exit;
 
+	//Only the warp statues Link has woken (see the warp_statues script). He comes out just below one.
 	with (obj_flute_spot) {
-		array_push(other.spot_name, spot_name);
-		array_push(other.spot_x, x);
-		array_push(other.spot_y, y);
+		if (warp_statue_awake()) {
+			array_push(other.spot_name, spot_name);
+			array_push(other.spot_x, x);
+			array_push(other.spot_y, y + 16);
+		}
 	}
-	//No spots here: it was just the song
+	//No statues awake here: it was just the song
 	if (array_length(spot_name) == 0) {
 		with (obj_link) {state = "idle"}
 		instance_destroy();

@@ -4,6 +4,8 @@
   "name": "obj_flute_spot",
   "eventList": [
     {"resourceType":"GMEvent","resourceVersion":"1.0","name":"","collisionObjectId":null,"eventNum":0,"eventType":0,"isDnD":false,},
+    {"resourceType":"GMEvent","resourceVersion":"1.0","name":"","collisionObjectId":null,"eventNum":0,"eventType":3,"isDnD":false,},
+    {"resourceType":"GMEvent","resourceVersion":"1.0","name":"","collisionObjectId":null,"eventNum":0,"eventType":8,"isDnD":false,},
   ],
   "managed": true,
   "overriddenProperties": [],
@@ -11,7 +13,10 @@
     "name": "World",
     "path": "folders/Objects/World.yy",
   },
-  "parentObjectId": null,
+  "parentObjectId": {
+    "name": "obj_npc",
+    "path": "objects/obj_npc/obj_npc.yy",
+  },
   "persistent": false,
   "physicsAngularDamping": 0.1,
   "physicsDensity": 0.5,
@@ -28,9 +33,9 @@
   "properties": [],
   "solid": false,
   "spriteId": {
-    "name": "spr_marker_flute",
-    "path": "sprites/spr_marker_flute/spr_marker_flute.yy",
+    "name": "spr_warp_statue",
+    "path": "sprites/spr_warp_statue/spr_warp_statue.yy",
   },
   "spriteMaskId": null,
-  "visible": false,
+  "visible": true,
 }

@@ -109,13 +109,56 @@ THE OPENING (a new file: the dream, then waking up at home)
 [NEED] snd_knock                     The elder knocking at Gigglebuns's door
 (the elder coming in and going out uses snd_door)
 
+THE SWORD, HEALTH (game feel)
+-----------------------------
+[NEED] snd_spin_ready                The sword flashing: the spin attack is charged
+[NEED] snd_spin                      The spin attack
+[NEED] snd_sword_beam                The Sword of Bun's beam (swinging at full health)
+[NEED] snd_low_health                The low-health beep (repeats while you're on one heart; can be turned off in Options)
+
+THE SWORD OF BUN'S PEDESTAL (the hidden forest)
+-----------------------------------------------
+[NEED] snd_bun_socket                A piece of the Bun settling into the pedestal
+[NEED] snd_pedestal_glow             The pedestal filling with light
+[NEED] snd_pedestal_flash            The flash as the sword comes free
+(the sword itself uses snd_fanfare_item)
+
+THE CASTLE OF BUNSRIEL
+----------------------
+[NEED] snd_wizard_appear             A wizard blinking in or out
+[NEED] snd_wizard_charge             A wizard (or the Archmage, or the Evil King) gathering a spell
+[NEED] snd_wizard_cast               A spell let go
+[NEED] snd_reflect                   The mirror shield bouncing magic back
+[NEED] snd_chill                     Link hit by a frost wizard's ice
+[NEED] snd_summon                    Something climbing out of a summoning circle
+[NEED] snd_king_laugh                The Evil King laughing (rising off his throne, splitting into shadows)
+(lightning uses snd_thunder; the bosses use snd_boss_roar and snd_boss_defeat)
+
+MUSIC: PLACEHOLDERS (a short made-up loop each: replace the sound in GameMaker, keep the name)
+-------------------
+[TEMP] CastleTheme           The Castle of Bunsriel (Menu_Castle)
+[TEMP] FinalBossTheme        The Evil King fight
+[TEMP] EndingTheme           The ending and the cast
+
 MUSIC (already imported)
 ------------------------
 [HAVE] Title                 Title screen
 [HAVE] DungeonOne            The Southern Tower
 [HAVE] LadhellinTower        The Tower of Ladhellin (Menu_LadhellinTower)
-[HAVE] BossTheme             The Gargoyle fight
+[HAVE] BossTheme             The tower bosses' fights (and the Archmage's room plays the castle's music)
 
 
 Still NEED for the demo: 1 sounds
 Tip: snd_fanfare_item and snd_fanfare_bun matter most (the grapple hook, boss key and the Bun use them).
+
+NEW (THE ARCANUM, THE WORLD'S EXTRAS)
+-------------------------------------
+[NEED] snd_push                      A push block sliding a tile
+[NEED] snd_freeze                    The ice rod freezing water or a flame jet
+[NEED] snd_melt                      The fire rod melting an ice block
+[NEED] snd_burn                      The fire rod burning a barricade or bramble
+[NEED] snd_zap                       The lightning rod charging a metal post
+[NEED] snd_fairy                     The Great Fairy's magic (and the rush's resting fairy)
+[NEED] snd_target                    A shooting gallery target hit
+[NEED] snd_bite                      A fish biting (fishing)
+[NEED] snd_bunling                   A lost bunling found

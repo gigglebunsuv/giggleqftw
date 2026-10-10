@@ -13,8 +13,17 @@ if (global.pause_block) {
 	act_a = false;
 	act_b = false;
 	act_y = false;
+	act_x = false;
 	act_start = false;
 	hold_run = false;
+}
+
+//Hitstop: a hit just landed, everything holds still for a moment (see the game_feel script).
+//A B press now still counts once it's over.
+if (feel_frozen()) {
+	if (act_b) {sword_buffer = SWORD_BUFFER}
+	image_speed = 0;
+	exit;
 }
 
 //Talking: obj_dialogue has the game frozen until the conversation ends
@@ -29,8 +38,9 @@ if (instance_exists(obj_cutscene)) {
 	exit;
 }
 
-//Holding up something from a chest: obj_item_get lets him go once its text box closes
-if (state == "itemget") {
+//Holding up something from a chest: obj_item_get lets him go once its text box closes.
+//A scene (the Sword of Bun's pedestal) moves him itself.
+if (state == "itemget" || state == "scene") {
 	image_speed = 0;
 	exit;
 }
@@ -50,95 +60,26 @@ if (act_start && state == "idle") {
 	exit;
 }
 
+//Debug menu: F1 / Select (the pause screen opened on it, see the debug_menu script)
+if (DEBUG_MENU && act_debug && state == "idle") {
+	global.debug_menu_request = true;
+	instance_create_depth(0, 0, -1000, obj_pause_menu);
+	exit;
+}
+
 //In deep water? (flippers, see player_moves) In quicksand? (see the ladhellin script)
 player_swim_check();
+player_water_step();	//currents, a floe melting (see the puzzles script)
 player_quicksand_check();
 
 //B = sword, A and Y = equipped items (used further down). Not while swimming or carrying a rock.
-act_attack = act_b && global.swordTier > 0 && !swimming && !carrying;
+//A B press is remembered for a few steps, so pressing it just before a swing or a hit ends still swings.
+if (act_b) {sword_buffer = SWORD_BUFFER}
+else if (sword_buffer > 0) {sword_buffer--}
+act_attack = sword_buffer > 0 && global.swordTier > 0 && !swimming && !carrying;
 
-//Debug keys
-//	Ctrl  = lose half a heart	H = heal half a heart
-//	Shift = use 4 magic			M = restore 4 magic
-//	J     = add a heart container (up to 16)
-//	1-4   = add 10 money, 1 key, 1 bomb, 5 arrows
-//	5     = next Bun piece (clears all after the third)
-//	6-7   = next sword / shield tier (goes back to none after the last)
-//	8     = next armor tier (back to the tunic after the last)
-//	G / F / R = toggle strength gloves / flippers / running boots
-//	0     = get every item except the bottles
-//	B     = get all 5 bottles: red, green, blue potion, fairy, empty
-//	K / L = next bomb / arrow capacity (back to the smallest after the biggest)
-//	9     = go to the test dungeon
-//	O     = go to the overworld (rm_overworld), in front of Link's house
-//	I     = go to the item test room
-//	U     = go to the debug room (a section for every item, chests and signs)
-//	T     = go to the Southern Tower's entrance
-if (keyboard_check_pressed(vk_control))	{player_add_health(-1)}
-if (keyboard_check_pressed(ord("H")))	{player_add_health(1)}
-if (keyboard_check_pressed(vk_shift))	{player_add_magic(-4)}
-if (keyboard_check_pressed(ord("M")))	{player_add_magic(4)}
-if (keyboard_check_pressed(ord("J")))	{player_add_heart()}
-if (keyboard_check_pressed(ord("1")))	{player_add_money(10)}
-if (keyboard_check_pressed(ord("2")))	{player_add_keys(1)}
-if (keyboard_check_pressed(ord("3")))	{player_add_bombs(1)}
-if (keyboard_check_pressed(ord("4")))	{player_add_arrows(5)}
-if (keyboard_check_pressed(ord("5"))) {
-	var piece = 0;
-	while (piece < BUN_PIECES && global.bunPieces[piece]) {piece++}
-	if (piece < BUN_PIECES) {bun_collect(piece)}
-	else {global.bunPieces = array_create(BUN_PIECES, false)}
-}
-if (keyboard_check_pressed(ord("6")))	{global.swordTier = (global.swordTier + 1) mod (SWORD_TIER_MAX + 1)}
-if (keyboard_check_pressed(ord("7")))	{shield_set_tier((global.shieldTier + 1) mod (SHIELD_TIER_MAX + 1))}
-if (keyboard_check_pressed(ord("8")))	{global.armorTier = (global.armorTier mod ARMOR_TIER_MAX) + 1}
-if (keyboard_check_pressed(ord("G")))	{global.hasGloves = !global.hasGloves}
-if (keyboard_check_pressed(ord("F")))	{global.hasFlippers = !global.hasFlippers}
-if (keyboard_check_pressed(ord("R")))	{global.hasBoots = !global.hasBoots}
-if (keyboard_check_pressed(ord("0"))) {
-	var every = [ITEM.BOW, ITEM.BOMBS, ITEM.BOOMERANG, ITEM.GRAPPLE, ITEM.LANTERN, ITEM.FIRE_ROD, ITEM.ICE_ROD,
-		ITEM.LIGHTNING_ROD, ITEM.FLUTE, ITEM.HAMMER, ITEM.SHOVEL, ITEM.CAPE, ITEM.MIRROR, ITEM.LENS];
-	for (var i = 0; i < array_length(every); i++) {item_give(every[i])}
-}
-if (keyboard_check_pressed(ord("B"))) {
-	for (var i = 0; i < BOTTLES; i++) {item_give(ITEM.BOTTLE_1 + i)}
-	global.bottles = [BOTTLE.RED, BOTTLE.GREEN, BOTTLE.BLUE, BOTTLE.FAIRY, BOTTLE.EMPTY];
-}
-if (keyboard_check_pressed(ord("K")) && !player_upgrade_bombs()) {
-	global.bombLevel = 0;
-	global.pBombsMax = 8;
-	global.pBombs = min(global.pBombs, global.pBombsMax);
-}
-if (keyboard_check_pressed(ord("L")) && !player_upgrade_arrows()) {
-	global.arrowLevel = 0;
-	global.pArrowsMax = 20;
-	global.pArrows = min(global.pArrows, global.pArrowsMax);
-}
-if (keyboard_check_pressed(ord("I"))) {
-	room_goto(rm_item_test);
-	x = 264;
-	y = 184;
-}
-if (keyboard_check_pressed(ord("U"))) {
-	room_goto(rm_debug);
-	x = DEBUG_START_X;
-	y = DEBUG_START_Y;
-}
-if (keyboard_check_pressed(ord("O"))) {
-	room_goto(rm_overworld);
-	x = WORLD_START_X;
-	y = WORLD_START_Y;
-}
-if (keyboard_check_pressed(ord("T"))) {
-	room_goto(rm_southern_tower);
-	x = TOWER_START_X;
-	y = TOWER_START_Y;
-}
-if (keyboard_check_pressed(ord("9"))) {
-	room_goto(rm_test_dungeon);
-	x = 384;
-	y = 640;
-}
+//Debug menu cheats: god mode, infinite magic and ammo (see the debug_menu script)
+debug_cheats_step();
 
 if global.pHealth < 0 {
 	global.pHealth = 0;
@@ -154,6 +95,9 @@ if (global.pHealth <= 0) {
 	exit;
 }
 
+//Beeps while health is low (see the game_feel script)
+low_health_step();
+
 //Flash after getting hurt
 if (hurt_timer > 0) {hurt_timer--}
 image_alpha = 1;
@@ -165,6 +109,11 @@ yy = move_down - move_up;
 //Same speed every way (diagonals aren't faster)
 var move_spd = spd;
 if (xx != 0 && yy != 0) {move_spd *= 0.7071}
+//Chilled by ice: half speed for a moment
+if (chill_timer > 0) {
+	chill_timer--;
+	move_spd *= 0.5;
+}
 hspd = xx*move_spd;
 vspd = yy*move_spd;
 
@@ -205,20 +154,16 @@ ledge_hop_check();
 ledge_hop_step();
 
 // Carrying a rock: any button throws it
-if (carrying && state == "idle" && (act_a || act_b || act_y)) {
+if (carrying && state == "idle" && (act_a || act_b || act_y || act_x)) {
 	player_throw_rock();
 }
 
-// Attack: obj_sword swings the blade around Link (he holds still while it does)
-if(act_attack&&state="idle"){
-	state="attack";
-	shielding=false;
-	cnt=0;
-	dur=10;
-	spr_prev=sprite_index;
-	pose=LINK_FRAME_SWORD;
-	instance_create_depth(x,y,depth-1,obj_sword);
+// Attack: obj_sword swings the blade around Link (he holds still while it does).
+// Holding B afterwards charges the spin attack (see player_sword_start and player_spin_step).
+if(act_attack&&state="idle"&&!carrying){
+	player_sword_start();
 }
+player_spin_step();
 
 // Open the chest, or talk to the NPC (or read the sign) Link is facing with A
 // (instead of using the item on A). Not from the water: a chest in a flooded basin waits till it's drained.
@@ -235,12 +180,15 @@ if (act_a && state == "idle" && !carrying && !swimming) {
 	}
 }
 
-// Use the items on A and Y
+// Use the items on A, Y and X
 if (act_a && state == "idle" && player_can_use(global.itemA)) {
 	item_use(global.itemA);
 }
 if (act_y && state == "idle" && player_can_use(global.itemY)) {
 	item_use(global.itemY);
+}
+if (act_x && state == "idle" && player_can_use(global.itemX)) {
+	item_use(global.itemX);
 }
 
 // Knocked back after getting hurt
@@ -255,10 +203,18 @@ player_fall_step();
 // Dropping down from the floor above (see floor_drop)
 floor_land_step();
 
-// Timer01 (the grapple hook, the flute, the boots, jumping and falling end their own states)
-if(state!="idle"&&state!="hook"&&state!="pull"&&state!="flute"&&state!="charge"&&state!="dash"&&state!="jump"&&state!="fall"&&state!="hop"){
+// Timer01 (the grapple hook, the flute, the boots, jumping, falling and charging the spin end their own states)
+if(state!="idle"&&state!="hook"&&state!="pull"&&state!="flute"&&state!="charge"&&state!="dash"&&state!="jump"&&state!="fall"&&state!="hop"&&state!="spin_charge"){
 	if(cnt<dur){cnt++}
-	if(cnt>=dur){state="idle";sprite_index=spr_prev;pose=-1}
+	if(cnt>=dur){
+		//Still holding B after a swing: charge the spin attack
+		if(state=="attack"&&hold_b&&!swimming&&!carrying&&instance_exists(obj_sword)){
+			state="spin_charge";
+			spin_t=0;
+		}else{
+			state="idle";sprite_index=spr_prev;pose=-1;
+		}
+	}
 }
 
 // Frame for walking, running, or the sword/hammer/rock pose

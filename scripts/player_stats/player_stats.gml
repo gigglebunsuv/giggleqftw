@@ -2,6 +2,8 @@
 //All amounts can be negative (damage, spending, using items).
 
 #macro PLAYER_HEARTS_MAX 16
+#macro MAGIC_BASE 32			//the magic meter at the start
+#macro MAGIC_UPGRADED 96		//...tripled by the magic upgrade (the Arcanum's last treasure)
 
 ///player_add_health(amount);
 function player_add_health(argument0) {
@@ -14,6 +16,23 @@ function player_add_health(argument0) {
 ///player_add_magic(amount);
 function player_add_magic(argument0) {
 	global.pMagic = clamp(global.pMagic + argument0, 0, global.pMagicMax);
+
+
+}
+
+///magic_upgraded();
+function magic_upgraded() {
+	//True once the magic upgrade has tripled Link's magic (the HUD's meter is longer, with a "3x")
+	return global.pMagicMax > MAGIC_BASE;
+
+
+}
+
+///player_upgrade_magic();
+function player_upgrade_magic() {
+	//The magic upgrade: three times the magic, and it's full
+	global.pMagicMax = MAGIC_UPGRADED;
+	global.pMagic = global.pMagicMax;
 
 
 }
@@ -54,8 +73,9 @@ function player_add_bombs(argument0) {
 
 ///player_upgrade_bombs();
 function player_upgrade_bombs() {
-	//Bigger bomb bag: 8 -> 16 -> 64, and fills it. Returns false if it's already the biggest.
-	var caps = [8, 16, 64];
+	//Bigger bomb bag: 8 -> 16 -> 64 (the bomb shop) -> 99 (the Great Fairy), and fills it.
+	//Returns false if it's already the biggest.
+	var caps = [8, 16, 64, 99];
 	if (global.bombLevel >= array_length(caps) - 1) return false;
 	global.bombLevel++;
 	global.pBombsMax = caps[global.bombLevel];
@@ -67,8 +87,9 @@ function player_upgrade_bombs() {
 
 ///player_upgrade_arrows();
 function player_upgrade_arrows() {
-	//Bigger quiver: 20 -> 40 -> 80, and fills it. Returns false if it's already the biggest.
-	var caps = [20, 40, 80];
+	//Bigger quiver: 20 -> 40 -> 80 (the bomb shop) -> 99 (the Great Fairy), and fills it.
+	//Returns false if it's already the biggest.
+	var caps = [20, 40, 80, 99];
 	if (global.arrowLevel >= array_length(caps) - 1) return false;
 	global.arrowLevel++;
 	global.pArrowsMax = caps[global.arrowLevel];
@@ -113,10 +134,11 @@ function player_hurt(argument0, argument1, argument2) {
 				carrying = false;
 				rock_break(x, y);
 			}
-			player_add_health(-player_armor_damage(argument0));
+			player_add_health(-player_damage_taken(argument0));	//Hero Mode, armor, the Echo Charm
 			if (global.pHealth > 0) {sfx_play(SFX_PLAYER_HURT)}
+			feel_shake(SHAKE_HURT, SHAKE_HURT_TIME);
 			hurt_timer = 60;
-			if (state == "idle" || state == "jump") {spr_prev = sprite_index}
+			if (state == "idle" || state == "jump" || state == "charge" || state == "dash") {spr_prev = sprite_index}
 			state = "hurt";
 			cnt = 0;
 			dur = 8;
@@ -160,13 +182,15 @@ function player_face_angle(argument0) {
 
 ///player_get_sprite(dir);
 function player_get_sprite(argument0) {
-	//Link's walking sprite facing dir, by armor: red tunic, blue chain-mail, golden armor
+	//Link's walking sprite facing dir, by armor: red tunic, blue chain-mail, golden armor.
+	//The bunny tunic (just looks, see the bunlings script) is drawn over whatever armor he has on.
 	var tier = clamp(global.armorTier, 1, ARMOR_TIER_MAX) - 1;
-	var sprs = [spr_link_down, spr_link_down_blue, spr_link_down_gold];
+	if (tunic_worn()) {tier = 3}
+	var sprs = [spr_link_down, spr_link_down_blue, spr_link_down_gold, spr_link_down_bun];
 	switch (argument0) {
-		case "up": sprs = [spr_link_up, spr_link_up_blue, spr_link_up_gold]; break;
-		case "left": sprs = [spr_link_left, spr_link_left_blue, spr_link_left_gold]; break;
-		case "right": sprs = [spr_link_right, spr_link_right_blue, spr_link_right_gold]; break;
+		case "up": sprs = [spr_link_up, spr_link_up_blue, spr_link_up_gold, spr_link_up_bun]; break;
+		case "left": sprs = [spr_link_left, spr_link_left_blue, spr_link_left_gold, spr_link_left_bun]; break;
+		case "right": sprs = [spr_link_right, spr_link_right_blue, spr_link_right_gold, spr_link_right_bun]; break;
 	}
 	return sprs[tier];
 

@@ -11,7 +11,9 @@
 //dungeon's keys, swapped in and out by dungeon_room_start. Dungeon 0 = not in a dungeon.
 //Doors: obj_locked_door (small key), obj_boss_door (boss key), obj_shutter_door (opens by itself).
 
-#macro DUNGEON_COUNT 4			//0 = outside, 1 = the Southern Tower, 2 the Bog Tower, 3 the Tower of Ladhellin
+#macro DUNGEON_COUNT 6			//0 = outside, 1 = the Southern Tower, 2 the Bog Tower, 3 the Tower of Ladhellin, 4 the Castle of Bunsriel,
+								//5 the Arcanum (the rods, optional: see the arcanum script)
+#macro DUNGEON_CASTLE 4
 #macro FLOOR_FADE_TIME 12		//steps to fade out (and back in) on the stairs between floors
 #macro FLOOR_NAME_TIME 90		//steps the floor's name ("2F") shows after changing floors
 #macro DROP_HEIGHT 48			//pixels Link falls from after dropping through a hole
@@ -46,6 +48,8 @@ function dungeon_of_room(argument0) {
 	if (argument0 == rm_southern_tower) return 1;
 	if (argument0 == rm_bog_tower) return 2;
 	if (argument0 == rm_ladhellin_tower) return 3;
+	if (argument0 == rm_castle) return DUNGEON_CASTLE;
+	if (argument0 == rm_arcanum) return DUNGEON_ARCANUM;
 	return 0;
 
 
@@ -57,6 +61,8 @@ function dungeon_name(argument0) {
 		case 1: return "SOUTHERN TOWER";
 		case 2: return "BOG TOWER";
 		case 3: return "TOWER OF LADHELLIN";
+		case DUNGEON_CASTLE: return "CASTLE OF BUNSRIEL";
+		case DUNGEON_ARCANUM: return "THE ARCANUM";
 	}
 	return "";
 
@@ -71,6 +77,8 @@ function dungeon_entrance(argument0) {
 		case 1: return [rm_southern_tower, TOWER_START_X, TOWER_START_Y];
 		case 2: return [rm_bog_tower, BOG_START_X, BOG_START_Y];
 		case 3: return [rm_ladhellin_tower, LADHELLIN_START_X, LADHELLIN_START_Y];
+		case DUNGEON_CASTLE: return [rm_castle, CASTLE_START_X, CASTLE_START_Y];
+		case DUNGEON_ARCANUM: return [rm_arcanum, ARCANUM_START_X, ARCANUM_START_Y];
 	}
 	return [noone, 0, 0];
 
@@ -106,6 +114,15 @@ function dungeon_step() {
 		var flag = zone_visit_flag(zone);
 		if (!flag_get(flag)) {flag_set(flag, true)}
 	}
+
+
+}
+
+///dungeon_enemy_tier(dungeon);
+function dungeon_enemy_tier(argument0) {
+	//How much tougher enemies are in a dungeon (see enemy_tier_apply): 0 as made, 1 the castle
+	if (argument0 == DUNGEON_CASTLE) return 1;
+	return 0;
 
 
 }
@@ -408,6 +425,24 @@ function shutter_should_open() {
 				if (zone_switch_pressed(zones[i])) return true;
 			}
 			return false;
+		case "crystal":
+			//Every crystal switch in one of its rooms struck (the castle script)
+			for (var i = 0; i < array_length(zones); i++) {
+				if (zone_crystals_on(zones[i])) return true;
+			}
+			return false;
+		case "switches":
+			//Every floor switch in one of its rooms down at the same time (the puzzles script)
+			for (var i = 0; i < array_length(zones); i++) {
+				if (zone_switches_all(zones[i])) return true;
+			}
+			return false;
+		case "posts":
+			//Every lightning post in one of its rooms charged at the same time (the puzzles script)
+			for (var i = 0; i < array_length(zones); i++) {
+				if (zone_posts_charged(zones[i])) return true;
+			}
+			return false;
 	}
 	return true;
 
@@ -438,7 +473,7 @@ function boss_music_step() {
 	//is alive. Leaving before it wakes up brings the dungeon's music back; beating it stops the
 	//theme, and the dungeon's music comes back once the explosions are over.
 	var zone = cam_zone_at(x, y);
-	var boss_alive = instance_exists(boss_object) && !flag_get(boss_flag(global.dungeon));
+	var boss_alive = instance_exists(boss_object) && (!flag_get(boss_flag(global.dungeon)) || rush_wants(boss_object));
 	var fighting = boss_alive && zone != noone && global.cam_zone == zone;
 
 	if (fighting && !music_on) {
@@ -560,6 +595,38 @@ function dungeon_start_ladhellin() {
 	global.hasGloves = true;
 	global.hasBoots = true;
 	flag_set(TRADE_FLAG, TRADE_DONE);
+
+
+}
+
+///dungeon_start_castle();
+function dungeon_start_castle() {
+	//Level select: Link starts at the Castle of Bunsriel's gatehouse with what he'd have after the
+	//three towers and the hidden forest: 7 hearts, the Sword of Bun, the big shield, golden armor,
+	//the lantern, grapple hook, bow, hammer, cape, Sun Lens, flippers, gloves (no boots, boomerang
+	//or bombs: the castle mustn't need them, and its armory has a bomb bag)
+	global.pHealthMax = 14;
+	global.pHealth = 14;
+	global.pMagic = global.pMagicMax;
+	global.pMoney = 300;
+	global.swordTier = SWORD_TIER_BUN;
+	global.armorTier = 3;
+	for (var i = 0; i < ITEM.COUNT; i++) {item_take(i)}
+	global.pBombs = 0;
+	shield_set_tier(2);
+	item_give(ITEM.LANTERN);
+	item_give(ITEM.GRAPPLE);
+	item_give(ITEM.BOW);
+	item_give(ITEM.HAMMER);
+	item_give(ITEM.CAPE);
+	item_give(ITEM.LENS);
+	global.pArrows = global.pArrowsMax;
+	global.hasFlippers = true;
+	global.hasGloves = true;
+	global.hasBoots = false;
+	for (var b = 0; b < BUN_PIECES; b++) {global.bunPieces[b] = true}
+	flag_set(TRADE_FLAG, TRADE_DONE);
+	flag_set(PEDESTAL_FLAG, true);
 
 
 }

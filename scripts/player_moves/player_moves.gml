@@ -23,6 +23,19 @@
 #macro FALL_TIME 20			//steps shrinking away into the pit
 #macro FALL_DAMAGE 1		//half a heart, then back to the last safe spot
 
+//The sword: B swings it. Keep holding B after the swing and Link holds it out while he charges
+//(walking slowly, still facing the same way); let go once it flashes for the spin attack.
+//The Sword of Bun also shoots a beam with every swing while Link's health is full.
+#macro SWORD_BUFFER 4		//steps a B press is remembered (pressed just before a swing or a hit ends)
+#macro SPIN_CHARGE_TIME 24	//steps of holding B before the spin is ready
+#macro SPIN_TIME 14			//steps the spin takes
+#macro SPIN_WALK 0.5		//times normal speed while charging
+#macro SWORD_BEAM_SPEED 5
+#macro SWORD_BEAM_DAMAGE 2
+#macro SFX_SPIN_READY "snd_spin_ready"	//the sword flashing, the spin attack ready
+#macro SFX_SPIN "snd_spin"				//the spin attack
+#macro SFX_SWORD_BEAM "snd_sword_beam"	//the Sword of Bun's beam
+
 //Frames in Link's walking sprites (spr_link_down etc., 8 frames each)
 #macro LINK_FRAME_WALK 0	//0-1 walking
 #macro LINK_FRAME_SWORD 2	//arm out, swinging the sword
@@ -44,8 +57,8 @@ function player_move(argument0, argument1) {
 	//Moves Link by whole pixels: the fractions are kept for the next step, so 2.5 a step
 	//is 2, 3, 2, 3... and he's always drawn on the pixel grid. Slides him around wall corners
 	//he only clips by a few pixels. Returns true if he bumped into something.
-	move_frac_x += argument0;
-	move_frac_y += argument1;
+	move_frac_x += argument0 * global.dbg_speed;	//the debug menu's walk speed (1 normally)
+	move_frac_y += argument1 * global.dbg_speed;
 	if (argument0 == 0) {move_frac_x = 0}
 	if (argument1 == 0) {move_frac_y = 0}
 	var hs = sign(move_frac_x) * floor(abs(move_frac_x) + 0.0001);
@@ -53,6 +66,12 @@ function player_move(argument0, argument1) {
 	move_frac_x -= hs;
 	move_frac_y -= vs;
 
+	//The debug menu's no clip: straight through walls
+	if (global.dbg_noclip) {
+		x += hs;
+		y += vs;
+		return false;
+	}
 	player_corner_slip(hs, vs);
 	return level_move(hs, vs, level);
 
@@ -158,6 +177,8 @@ function player_dash_step() {
 	anim_rate = 2;
 
 	var ang = player_face_angle(dir);
+	//Rubble in the way (the castle) is smashed instead of bonking off it
+	rubble_dash_check(x + lengthdir_x(DASH_SPEED + 1, ang), y + lengthdir_y(DASH_SPEED + 1, ang));
 	if (player_move(lengthdir_x(DASH_SPEED, ang), lengthdir_y(DASH_SPEED, ang))) {
 		//Bonk: knocked back like getting hurt, but no damage
 		state = "hurt";
@@ -184,7 +205,7 @@ function player_swim_check() {
 	//Not while he's in the air. A rock he's carrying breaks when he goes in.
 	if (state == "jump") return;
 	var was = swimming;
-	swimming = position_meeting(x, y, obj_water);
+	swimming = position_meeting(x, y, obj_water) && !position_meeting(x, y, obj_ice_floe);
 	if (swimming && !was) {
 		sfx_play(SFX_SPLASH);
 		if (carrying) {
@@ -273,6 +294,7 @@ function player_pit_check() {
 	//Link falls in when his middle has been over a pit (obj_pit) for more than FALL_GRACE steps.
 	//On solid ground away from pits, remembers where he is to come back to after falling.
 	if (state == "jump" || state == "fall" || state == "pull" || state == "dead" || state == "hop") return;
+	if (global.dbg_noclip) return;	//the debug menu's no clip walks over pits
 	if (position_meeting(x, y, obj_pit)) {
 		fall_grace++;
 		if (fall_grace > FALL_GRACE) {player_fall_start()}
@@ -280,7 +302,9 @@ function player_pit_check() {
 	}
 	fall_grace = 0;
 	if (state == "idle" && !swimming && !in_sand && collision_rectangle(x - 8, y - 8, x + 8, y + 8, obj_pit, false, true) == noone
-		&& collision_rectangle(x - 8, y - 8, x + 8, y + 8, obj_quicksand, false, true) == noone) {
+		&& collision_rectangle(x - 8, y - 8, x + 8, y + 8, obj_quicksand, false, true) == noone
+		&& collision_rectangle(x - 8, y - 8, x + 8, y + 8, obj_ice_floe, false, true) == noone
+		&& collision_rectangle(x - 8, y - 8, x + 8, y + 8, obj_crumble, false, true) == noone) {
 		safe_x = x;
 		safe_y = y;
 		safe_level = level;
@@ -320,6 +344,8 @@ function player_fall_step() {
 		if (!no_drop && floor_drop()) return;
 		image_xscale = 1;
 		image_yscale = 1;
+		//The spot he'd come back to may have fallen in since (a cracked floor): the nearest solid ground
+		if (position_meeting(safe_x, safe_y, obj_pit)) {player_safe_ground()}
 		x = safe_x;
 		y = safe_y;
 		if (level_room_uses_levels()) {level_set(safe_level)}
@@ -330,6 +356,31 @@ function player_fall_step() {
 		player_add_health(-FALL_DAMAGE);
 		if (global.pHealth > 0) {sfx_play(SFX_PLAYER_HURT)}
 		hurt_timer = 60;
+	}
+
+
+}
+
+///player_safe_ground();
+function player_safe_ground() {
+	//Moves safe_x/safe_y to the nearest tile middle (up to 4 tiles away) with no pit, wall or cracked floor
+	var cx = (safe_x div 16) * 16 + 8;
+	var cy = (safe_y div 16) * 16 + 8;
+	for (var r = 1; r <= 4; r++) {
+		for (var dy = -r; dy <= r; dy++) {
+			for (var dx = -r; dx <= r; dx++) {
+				if (max(abs(dx), abs(dy)) != r) continue;
+				var px = cx + dx * 16;
+				var py = cy + dy * 16;
+				if (collision_rectangle(px - 7, py - 7, px + 7, py + 7, obj_pit, false, true) == noone
+					&& collision_rectangle(px - 7, py - 7, px + 7, py + 7, obj_wall, false, true) == noone
+					&& collision_rectangle(px - 7, py - 7, px + 7, py + 7, obj_crumble, false, true) == noone) {
+					safe_x = px;
+					safe_y = py;
+					return;
+				}
+			}
+		}
 	}
 
 
@@ -388,6 +439,128 @@ function rock_break(argument0, argument1) {
 	//A heavy rock smashing (thrown, dropped): the puff and the sound
 	instance_create_depth(argument0 - 12, argument1 - 12, depth - 1, obj_enemy_death);
 	sfx_play(SFX_ROCK);
+
+
+}
+
+//================================================================ the sword: swing, spin attack, beam
+
+///player_sword_start();
+function player_sword_start() {
+	//Run by obj_link: a swing (obj_sword). The Sword of Bun at full health also shoots a beam.
+	state = "attack";
+	shielding = false;
+	cnt = 0;
+	dur = 10;
+	spin_t = 0;
+	sword_buffer = 0;
+	spr_prev = sprite_index;
+	pose = LINK_FRAME_SWORD;
+	instance_create_depth(x, y, depth - 1, obj_sword);
+	if (global.swordTier >= SWORD_TIER_BUN && global.pHealth >= global.pHealthMax && !instance_exists(obj_sword_beam)) {
+		var ang = player_face_angle(dir);
+		var b = instance_create_depth(x + lengthdir_x(10, ang), y + lengthdir_y(10, ang), depth - 1, obj_sword_beam);
+		b.direction = ang;
+		b.image_angle = ang;
+		b.level = level;
+		sfx_play(SFX_SWORD_BEAM);
+	}
+
+
+}
+
+///player_spin_step();
+function player_spin_step() {
+	//Run by obj_link: charging (state "spin_charge") and the spin itself ("spin", ended by the timer)
+	if (state != "spin_charge") return;
+	if (swimming || carrying || !instance_exists(obj_sword)) {
+		player_spin_cancel();
+		return;
+	}
+	//Walks slowly, still facing the way he swung
+	player_move(hspd * SPIN_WALK, vspd * SPIN_WALK);
+	if (hspd != 0 || vspd != 0) {anim_rate = 1}
+	pose = LINK_FRAME_SWORD;
+	spin_t++;
+	if (spin_t == SPIN_CHARGE_TIME) {sfx_play(SFX_SPIN_READY)}
+	if (hold_b) return;
+
+	//Let go: spin if it was ready, otherwise just put the sword away
+	if (spin_t < SPIN_CHARGE_TIME) {
+		player_spin_cancel();
+		return;
+	}
+	state = "spin";
+	cnt = 0;
+	dur = SPIN_TIME;
+	sfx_play(SFX_SPIN);
+	with (obj_sword) {
+		mode = "spin";
+		cnt = 0;
+		dur = SPIN_TIME;
+		damage = global.swordTier * 2;
+		start_ang = player_face_angle(obj_link.dir);
+	}
+
+
+}
+
+///player_spin_cancel();
+function player_spin_cancel() {
+	state = "idle";
+	sprite_index = spr_prev;
+	pose = -1;
+	spin_t = 0;
+	with (obj_sword) {instance_destroy()}
+
+
+}
+
+///sword_spin_step();
+function sword_spin_step() {
+	//Run by obj_sword every step. Returns false if it's gone.
+	var face = player_face_angle(obj_link.dir);
+	switch (mode) {
+		case "swing":
+			if (cnt < dur) {cnt++}
+			//Sweep fast at the start, slowing at the end
+			var t = 1 - sqr(1 - cnt / dur);
+			image_angle = lerp(start_ang, end_ang, t);
+			if (cnt >= dur) {
+				//Still holding B: hold it out and charge the spin (obj_link goes to "spin_charge")
+				if (obj_link.hold_b && (obj_link.state == "attack" || obj_link.state == "spin_charge")) {
+					mode = "hold";
+				} else {
+					instance_destroy();
+					return false;
+				}
+			}
+			break;
+		case "hold":
+			if (obj_link.state != "attack" && obj_link.state != "spin_charge") {
+				instance_destroy();
+				return false;
+			}
+			image_angle = face;
+			damage = global.swordTier;
+			//Flashes once the spin is ready
+			image_blend = c_white;
+			if (obj_link.state == "spin_charge" && obj_link.spin_t >= SPIN_CHARGE_TIME && (obj_link.spin_t div 2) mod 2 == 0) {
+				image_blend = make_colour_rgb(255, 230, 120);
+			}
+			break;
+		case "spin":
+			image_blend = c_white;
+			if (cnt < dur) {cnt++}
+			//One full turn, clockwise, starting and ending where Link faces
+			image_angle = start_ang - 360 * (cnt / dur);
+			if (cnt >= dur || obj_link.state != "spin") {
+				instance_destroy();
+				return false;
+			}
+			break;
+	}
+	return true;
 
 
 }

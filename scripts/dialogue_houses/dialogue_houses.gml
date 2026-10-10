@@ -13,7 +13,8 @@
 #macro CAT_HOME_FLAG "cat_home"
 #macro CAT_REWARD_FLAG "cat_reward"
 #macro FORTUNE_PRICE 10
-#macro WORLD_HEART_PIECES 9					//pieces of heart out in the world (not counting the bosses' heart containers)
+#macro WORLD_HEART_PIECES 10				//pieces of heart out in the world (not counting the bosses' heart containers;
+											//the 10th is the fishing hole's legend, see the minigames script)
 
 //================================================================ Gigglebuns's house
 
@@ -397,9 +398,33 @@ function dlg_library_reader() {
 ///heart_pieces_found();
 function heart_pieces_found() {
 	//Pieces of heart Link has found out in the world: his hearts, less the 3 he started with and the
-	//bosses' heart containers (one per piece of the Bun)
-	var whole = global.pHealthMax div 2 - 3 - bun_count();
+	//bosses' heart containers he picked up
+	var containers = 0;
+	for (var d = 1; d <= 3; d++) {
+		if (flag_get(boss_reward_flag(d, "heart"))) {containers++}
+	}
+	var whole = global.pHealthMax div 2 - 3 - containers;
 	return clamp(whole * HEART_PIECES_PER_HEART + global.heartPieces, 0, WORLD_HEART_PIECES);
+
+
+}
+
+///warp_statues_awake();
+function warp_statues_awake() {
+	//How many warp statues Link has woken (their flags start with "warp_statue_")
+	var names = variable_struct_get_names(global.flags);
+	var n = 0;
+	for (var i = 0; i < array_length(names); i++) {
+		if (string_pos("warp_statue_", names[i]) == 1 && flag_get(names[i])) {n++}
+	}
+	return n;
+
+
+}
+
+///rods_found();
+function rods_found() {
+	return global.item_have[ITEM.FIRE_ROD] + global.item_have[ITEM.ICE_ROD] + global.item_have[ITEM.LIGHTNING_ROD];
 
 
 }
@@ -412,6 +437,8 @@ function dlg_heart_almanac() {
 	return [
 		"THE HEART PIECE ALMANAC.",
 		line,
+		"IN THE MARGINS, SOMEONE HAS KEPT COUNT: LOST BUNLINGS FOUND, " + string(bunlings_found()) + " OF " + string(BUNLINGS_TOTAL)
+			+ ". WARP STATUES WOKEN, " + string(warp_statues_awake()) + " OF " + string(WARP_STATUES_TOTAL) + ". MAGIC RODS, " + string(rods_found()) + " OF 3.",
 		dlg_choice("READ ABOUT WHICH LANDS?", [
 			["VILLAGE AND FIELDS", [
 				"UNDER HAVEN ITSELF, PAST THE OLD BONES, A HEART WAITS. ASK THE ONE WHO COLLECTS THINGS.",
@@ -429,6 +456,11 @@ function dlg_heart_almanac() {
 			]],
 			["THE DESERT", [
 				"IN THE DESERT, A LEDGE HIDES BEHIND HEAVY ROCKS. ONLY STRONG HANDS WILL MOVE THEM."
+			]],
+			["LAKES AND LEGENDS", [
+				"A LEGEND SWIMS IN THE MARSH LAKE, BIGGER THAN ANY FISH. THE FISHERMAN WILL LEND YOU HIS HOLE.",
+				"BEHIND THE OLD GATE IN THE NORTHEASTERN CLIFFS LIES THE ARCANUM, WHERE THREE RODS OF MAGIC SLEEP.",
+				"THE BUNLINGS HIDE WHERE YOUR TOOLS REACH: BEHIND BRAMBLES THAT ONLY FIRE BURNS, ACROSS WATER THAT ONLY ICE TAMES, BEHIND IRON THAT ONLY LIGHTNING OPENS."
 			]]
 		])
 	];
@@ -502,7 +534,8 @@ function dlg_ruin_journal() {
 		"A JOURNAL, LEFT BEHIND:",
 		"DAY 1: THE ORDER MARCHED IN. WE HID IN THE CELLAR.",
 		"DAY 9: THEY'VE SEALED THE CASTLE DOOR WITH SOMETHING. A GLOWING SEAL. NOTHING GETS THROUGH.",
-		"DAY 12: WE'RE LEAVING FOR HAVEN TONIGHT. IF ANYONE READS THIS: THE SEAL ONLY BREAKS FOR THE SWORD OF BUN."
+		"DAY 12: WE'RE LEAVING FOR HAVEN TONIGHT. IF ANYONE READS THIS: THE SEAL ONLY BREAKS FOR THE SWORD OF BUN.",
+		"P.S. MY OLD MIRROR IS IN THE CHEST. IT ALWAYS GOT ME OUT OF THE OLD MINES IN A HURRY. TAKE IT."
 	];
 
 

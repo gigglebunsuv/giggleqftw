@@ -17,3 +17,6 @@ clink_timer = 0;
 can_touch = true;		//false: high in the air, Link and his sword pass underneath
 arrow_weak = false;		//true: arrows hurt it even while it's invulnerable (a boss's open weak point)
 ignore_clear = false;	//true: "clear" shutter doors don't wait for it (things that can't be beaten)
+drops = true;			//false: leaves nothing behind when it dies (see enemy_drop)
+is_boss = false;		//true: hits freeze the game longer and shake the screen (see enemy_hurt)
+tier_done = false;		//the dungeon's toughness applied yet (see enemy_tier_apply)

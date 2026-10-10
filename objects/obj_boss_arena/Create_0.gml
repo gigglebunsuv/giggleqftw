@@ -19,3 +19,4 @@ resume_music = false;	//the boss was beaten: the dungeon's music comes back afte
 checked = false;
 rewards_out = false;
 portal_out = false;
+final = false;		//the last boss (the Evil King): no heart, no Bun, no warp: his defeat starts the ending

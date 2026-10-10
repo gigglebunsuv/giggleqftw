@@ -1,6 +1,6 @@
 /// @description Flute: the song, then the warp menu
-//Made by item_use_flute(). Link holds still while the song plays. Then, if the room has
-//obj_flute_spot markers, the game freezes (like the pause screen) and a spot can be picked.
+//Made by item_use_flute(). Link holds still while the song plays. Then, if the room has warp
+//statues (obj_flute_spot) Link has woken, the game freezes (like the pause screen) and one can be picked.
 
 timer = FLUTE_SONG_TIME;
 menu = false;

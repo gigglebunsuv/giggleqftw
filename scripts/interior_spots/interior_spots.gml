@@ -1,6 +1,8 @@
 //Places inside rm_interiors, in pixels. WRITTEN BY world_placeholders/make_interiors_room.py:
 //don't edit by hand, re-run the script (it rebuilds the room too).
 
+#macro ECHOES_X 968
+#macro ECHOES_Y 1176
 #macro HOME_BED_X 112
 #macro HOME_BED_Y 96
 #macro HOME_DOOR_X 184

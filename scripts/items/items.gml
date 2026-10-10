@@ -1,6 +1,6 @@
 //Items, equipment and The Bun.
 //
-//Items go on the A or Y button and are picked on the pause screen.
+//Items go on the A, Y or X button and are picked on the pause screen.
 //Where each item sits on the pause screen grid is set in item_grid().
 //Using the newer items (bottles, lantern, rods, flute, hammer, shovel, cape, mirror) is in
 //the items_use script. The Sun Lens is in the sun_lens script.
@@ -40,6 +40,8 @@ enum ITEM {
 #macro SWORD_TIER_MAX 4			//1 iron, 2-3 forged by the smith with Star Iron (optional), 4 the Sword of Bun
 #macro SWORD_TIER_BUN 4
 #macro SHIELD_TIER_MAX 3
+#macro SHIELD_ARC 60			//degrees either side of where Link faces that the wooden shield covers
+#macro SHIELD_ARC_BIG 80		//...the big and mirror shields
 #macro ARMOR_TIER_MAX 3
 
 #macro ITEM_STUN_TIME 120		//how long the boomerang and grapple hook stun enemies
@@ -271,6 +273,7 @@ function bomb_explode() {
 	image_index = 0;
 	image_speed = 0.3;
 	sfx_play(SFX_BOMB);
+	feel_shake(SHAKE_BOMB, SHAKE_BOMB_TIME);
 
 	//Link: armor helps, the shield doesn't
 	with (obj_link) {
@@ -284,7 +287,11 @@ function bomb_explode() {
 		}
 	}
 	with (obj_bomb_wall) {
-		if (collision_circle(bx, by, BOMB_RADIUS, id, false, false)) {instance_destroy()}
+		if (collision_circle(bx, by, BOMB_RADIUS, id, false, false)) {
+			flag_set(door_flag(), true);	//stays broken
+			sfx_play(SFX_SECRET);
+			instance_destroy();
+		}
 	}
 	with (obj_bomb) {
 		if (!exploded && level == lvl && collision_circle(bx, by, BOMB_RADIUS, id, false, false)) {
@@ -297,37 +304,41 @@ function bomb_explode() {
 
 ///item_give(item);
 function item_give(argument0) {
-	//For chests and pickups. Equips it on A if A is empty, otherwise on Y if Y is empty.
+	//For chests and pickups. Equips it on A if A is empty, otherwise on Y, otherwise on X.
 	if (global.item_have[argument0]) return;
 	global.item_have[argument0] = true;
 	if (global.itemA == ITEM.NONE) {global.itemA = argument0}
 	else if (global.itemY == ITEM.NONE) {global.itemY = argument0}
+	else if (global.itemX == ITEM.NONE) {global.itemX = argument0}
 
 
 }
 
 ///item_take(item);
 function item_take(argument0) {
-	//Removes an item and takes it off A/Y
+	//Removes an item and takes it off A/Y/X
 	global.item_have[argument0] = false;
 	if (global.itemA == argument0) {global.itemA = ITEM.NONE}
 	if (global.itemY == argument0) {global.itemY = ITEM.NONE}
+	if (global.itemX == argument0) {global.itemX = ITEM.NONE}
 
 
 }
 
 ///item_equip(item, button);
 function item_equip(argument0, argument1) {
-	//Puts an item on button 0 = A or 1 = Y.
-	//If it's already on the other button, the two buttons swap.
+	//Puts an item on button 0 = A, 1 = Y or 2 = X.
+	//If it's already on another button, the two buttons swap.
 	var item = argument0;
-	if (argument1 == 0) {
-		if (global.itemY == item) {global.itemY = global.itemA}
-		global.itemA = item;
-	} else {
-		if (global.itemA == item) {global.itemA = global.itemY}
-		global.itemY = item;
+	var slots = [global.itemA, global.itemY, global.itemX];
+	var b = clamp(argument1, 0, 2);
+	for (var i = 0; i < 3; i++) {
+		if (i != b && slots[i] == item) {slots[i] = slots[b]}
 	}
+	slots[b] = item;
+	global.itemA = slots[0];
+	global.itemY = slots[1];
+	global.itemX = slots[2];
 
 
 }
@@ -346,7 +357,7 @@ function shield_set_tier(argument0) {
 function shield_is_held() {
 	//Run by obj_link after input_get: is the button the shield is on being held?
 	if (global.shieldTier <= 0) return false;
-	return (global.itemA == ITEM.SHIELD && hold_a) || (global.itemY == ITEM.SHIELD && hold_y);
+	return item_button_held(ITEM.SHIELD);
 
 
 }
@@ -366,12 +377,23 @@ function shield_get_sprite() {
 
 ///shield_blocks(from_dir, tier_needed);
 function shield_blocks(argument0, argument1) {
-	//true if Link has his shield up, facing within 60 degrees of from_dir
+	//true if Link has his shield up, facing within SHIELD_ARC degrees of from_dir
 	//(the direction from Link towards the attack) and the shield is at least tier_needed.
-	//Weak attacks use 1, so any shield blocks them.
+	//Weak attacks use 1, so any shield blocks them. The wizards' spells need the big shield (2),
+	//and the mirror shield (3) bounces them back (see the castle_enemies script).
+	//The big and mirror shields cover a wider angle.
 	if (!instance_exists(obj_link)) return false;
 	if (!obj_link.shielding || global.shieldTier < argument1) return false;
-	return abs(angle_difference(player_face_angle(obj_link.dir), argument0)) <= 60;
+	var arc = (global.shieldTier >= 2) ? SHIELD_ARC_BIG : SHIELD_ARC;
+	return abs(angle_difference(player_face_angle(obj_link.dir), argument0)) <= arc;
+
+
+}
+
+///item_button_held(item);
+function item_button_held(argument0) {
+	//Run by obj_link after input_get: is the button this item is on (A, Y or X) being held?
+	return (global.itemA == argument0 && hold_a) || (global.itemY == argument0 && hold_y) || (global.itemX == argument0 && hold_x);
 
 
 }

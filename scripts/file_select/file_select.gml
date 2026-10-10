@@ -3,6 +3,7 @@
 //	4 FILE			a used file was picked: START or ERASE
 //	5 ERASE?		NO / YES
 //	6 NAME ENTRY	an empty file was picked: a letter grid, then the new game starts
+//	7 MODE			once any file has seen the ending: NORMAL or HERO for the new file (see the hero_mode script)
 //The files themselves are in the save_files script.
 
 #macro FILE_SELECT_MUSIC FileSelect	//the file select's music (-1: the Title music keeps playing)
@@ -137,6 +138,24 @@ function file_select_step(argument0) {
 		case 6:
 			name_entry_step();
 			break;
+
+		//The new file: NORMAL or HERO (B goes back to the name)
+		case 7:
+			if (act_b) {
+				menu = 6;
+				audio_play_sound(menu_switch, 2, false);
+				break;
+			}
+			if (menu_move_h != 0 || menu_move != 0) {
+				fs_hero = 1 - fs_hero;
+				audio_play_sound(menu_switch, 2, false);
+			}
+			if (accept) {
+				audio_play_sound(menu_select, 3, false);
+				file_select_music_stop();
+				save_new_game(fs_cursor, fs_name, fs_hero == 1);
+			}
+			break;
 	}
 
 
@@ -220,12 +239,22 @@ function name_entry_add(argument0) {
 
 ///name_entry_finish();
 function name_entry_finish() {
-	//END: the new game starts on this file
+	//END: the new game starts on this file (once any file has seen the ending, NORMAL or HERO first)
 	var nm = string_trim(name_text);
 	if (nm == "") {nm = SAVE_DEFAULT_NAME}
 	audio_play_sound(menu_select, 3, false);
+	var any_clear = false;
+	for (var i = 0; i < array_length(fs_slots); i++) {
+		if (fs_slots[i].cleared) {any_clear = true}
+	}
+	if (any_clear) {
+		fs_name = nm;
+		fs_hero = 0;
+		menu = 7;
+		return;
+	}
 	file_select_music_stop();
-	save_new_game(fs_cursor, nm);
+	save_new_game(fs_cursor, nm, false);
 
 
 }
@@ -254,6 +283,10 @@ function file_select_draw(argument0, argument1) {
 		name_entry_draw(gw, by, bh);
 		return;
 	}
+	if (menu == 7) {
+		hero_choice_draw(gw, by, bh);
+		return;
+	}
 
 	draw_set_halign(fa_center);
 	menu_draw_text(gw div 2, by + 8, "SELECT A FILE");
@@ -275,6 +308,18 @@ function file_select_draw(argument0, argument1) {
 			draw_set_halign(fa_left);
 		} else {
 			menu_draw_text_colour(px + 18, py + 4, s.name, col);
+			//A gold star after the name once the Evil King is beaten, a red one if it was in Hero Mode,
+			//a silver cup once the Hall of Echoes is beaten
+			var mark_x = px + 20 + string_length(s.name) * 8;
+			if (s.cleared) {
+				file_select_star(mark_x, py + 4);
+				mark_x += 9;
+			}
+			if (s.hero_clear) {
+				file_select_star_colour(mark_x, py + 4, make_colour_rgb(222, 124, 112));
+				mark_x += 9;
+			}
+			if (s.echoes) {file_select_trophy(mark_x, py + 4)}
 			//Hearts (8 a row), then the Bun pieces on the right
 			for (var h = 0; h < s.hearts; h++) {
 				draw_sprite(spr_hud_heart, 0, px + 18 + (h mod 8) * 8, py + 15 + (h div 8) * 8);
@@ -286,6 +331,7 @@ function file_select_draw(argument0, argument1) {
 			draw_set_font(small_font);
 			menu_draw_text_colour(mx + 20, py + 8, "TIME " + file_select_time(s.time), col);
 			menu_draw_text_colour(mx + 20, py + 18, "DEATHS " + string(s.deaths), col);
+			menu_draw_text_colour(mx + 20, py + 28, "DONE " + string(s.done) + "%" + (s.hero ? "  HERO" : ""), col);
 			draw_set_font(menu_font);
 			for (var b = 0; b < BUN_PIECES; b++) {
 				var frame = 0;
@@ -363,6 +409,49 @@ function name_entry_draw(argument0, argument1, argument2) {
 	menu_draw_text_colour(cx, argument1 + argument2 - 11, hint, c_ltgray);
 	draw_set_font(menu_font);
 	draw_set_halign(fa_left);
+
+
+}
+
+///hero_choice_draw(gui_w, box_y, box_h);
+function hero_choice_draw(argument0, argument1, argument2) {
+	//Menu 7: NORMAL or HERO for the new file
+	var cx = argument0 div 2;
+	var top = argument1 + 40;
+	draw_set_halign(fa_center);
+	menu_draw_text(cx, argument1 + 8, "CHOOSE A MODE");
+	menu_draw_text(cx, top, fs_name);
+	menu_draw_choice(cx - 48, top + 28, "NORMAL", fs_hero == 0);
+	menu_draw_choice(cx + 48, top + 28, "HERO", fs_hero == 1);
+	draw_set_font(small_font);
+	if (fs_hero == 1) {
+		menu_draw_text_colour(cx, top + 52, "EVERYTHING HITS TWICE AS HARD.", c_white);
+		menu_draw_text_colour(cx, top + 62, "NO HEARTS EVER DROP.", c_white);
+		menu_draw_text_colour(cx, top + 72, "BEAT IT FOR A RED STAR.", MENU_COL_CURSOR);
+	} else {
+		menu_draw_text_colour(cx, top + 52, "THE GAME AS IT WAS MEANT.", c_white);
+	}
+	var hint = "ARROWS: CHOOSE   Z: START   X: BACK";
+	if (global.input_using_pad) {hint = "DPAD: CHOOSE   A: START   B: BACK"}
+	menu_draw_text_colour(cx, argument1 + argument2 - 11, hint, c_ltgray);
+	draw_set_font(menu_font);
+	draw_set_halign(fa_left);
+
+
+}
+
+///file_select_star(x, y);
+function file_select_star(argument0, argument1) {
+	//A little gold star (7x7) for a file that has seen the ending
+	var col = make_colour_rgb(232, 208, 170);
+	var sx = argument0;
+	var sy = argument1;
+	menu_draw_rect(sx + 3, sy, 1, 7, col);
+	menu_draw_rect(sx, sy + 2, 7, 1, col);
+	menu_draw_rect(sx + 1, sy + 3, 5, 1, col);
+	menu_draw_rect(sx + 2, sy + 1, 3, 4, col);
+	menu_draw_rect(sx + 1, sy + 5, 1, 2, col);
+	menu_draw_rect(sx + 5, sy + 5, 1, 2, col);
 
 
 }

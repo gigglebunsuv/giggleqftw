@@ -2,12 +2,16 @@
 
 if (!checked) {
 	checked = true;
-	//Beaten before: no boss this time (and no explosions)
-	if (flag_get(boss_flag(global.dungeon))) {
+	//Beaten before: no boss this time (and no explosions). The Hall of Echoes' rush brings him back.
+	if (flag_get(boss_flag(global.dungeon)) && !rush_wants(boss_object)) {
 		with (boss_object) {instance_destroy(id, false)}
 	}
 }
+//The last boss: once he's gone, his defeat (obj_king_defeat) has the music and what comes next
+if (final && !instance_exists(boss_object)) exit;
 boss_music_step();
+if (final) exit;
+if (rush_active()) exit;	//the Hall of Echoes: no rewards, no warp out (see the echoes script)
 if (!flag_get(boss_flag(global.dungeon))) exit;
 
 if (!rewards_out) {

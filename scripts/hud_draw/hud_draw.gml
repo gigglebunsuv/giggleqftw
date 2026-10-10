@@ -11,6 +11,7 @@
 #macro SCREEN_W 256			//whole window in game pixels (bar + 256x176 view)
 #macro SCREEN_H 208
 #macro SCREEN_SCALE 4		//window = 1024x832
+#macro HUD_MAGIC_LEN_UP 62	//the magic meter's length once the magic upgrade has tripled it (the frame is 54)
 
 ///hud_set_gui_size();
 function hud_set_gui_size() {
@@ -67,7 +68,9 @@ function hud_play_area_window() {
 	var sw = surface_get_width(application_surface);
 	var sh = surface_get_height(application_surface);
 	var top = 0;
-	if (instance_exists(obj_link)) {top = HUD_HEIGHT * SCREEN_SCALE}
+	//Remember the room Link was seen in: menus that freeze the game (the flute, fishing) deactivate him too
+	if (instance_exists(obj_link)) {global.hud_link_room = room}
+	if (variable_global_exists("hud_link_room") && global.hud_link_room == room) {top = HUD_HEIGHT * SCREEN_SCALE}
 	return [(ww - sw) div 2, top + (wh - top - sh) div 2, sw, sh];
 
 
@@ -127,8 +130,9 @@ function hud_draw_letterbox() {
 ///hud_draw_bar();
 function hud_draw_bar() {
 	//The black bar: hearts with magic underneath on the left, money/keys and bombs/arrows
-	//in the middle, the Y, B and A item boxes on the right. Everything is laid out for the
-	//biggest it can get (16 hearts, the full bomb bag and quiver), so nothing moves or overlaps.
+	//in the middle, the X, Y, B and A item boxes on the right. Everything is laid out for the
+	//biggest it can get (16 hearts, the full bomb bag and quiver, the tripled magic meter and
+	//its "3x"), so nothing moves or overlaps.
 	var gw = display_get_gui_width();
 	menu_draw_rect(0, 0, gw, HUD_HEIGHT, c_black);
 
@@ -140,24 +144,25 @@ function hud_draw_bar() {
 	hud_draw_hearts(life_x, life_y);
 	hud_draw_magic(life_x, life_y + hearts_h + 2);
 
-	//Item boxes in the right corner: Y = second item, B = sword (by tier), A = equipped item
+	//Item boxes in the right corner: X = third item, Y = second item, B = sword (by tier), A = equipped item
 	var sw = sprite_get_width(spr_hud_slot);
 	var btn_gap = 2;
 	var btn_h = sprite_get_height(spr_hud_glyph) - 4 + sprite_get_height(spr_hud_slot);
-	var btn_x = gw - 4 - sw * 3 - btn_gap * 2;
+	var btn_x = gw - 4 - sw * 4 - btn_gap * 3;
 	var btn_y = (HUD_HEIGHT - btn_h) div 2;
 	var sword_spr = -1;
 	if (global.swordTier > 0) {sword_spr = spr_menu_sword}
-	hud_draw_button(btn_x, btn_y, 2, item_get_sprite(global.itemY), item_get_frame(global.itemY));
-	hud_draw_button(btn_x + sw + btn_gap, btn_y, 1, sword_spr, global.swordTier - 1);
-	hud_draw_button(btn_x + (sw + btn_gap) * 2, btn_y, 0, item_get_sprite(global.itemA), item_get_frame(global.itemA));
+	hud_draw_button(btn_x, btn_y, 3, item_get_sprite(global.itemX), item_get_frame(global.itemX));
+	hud_draw_button(btn_x + sw + btn_gap, btn_y, 2, item_get_sprite(global.itemY), item_get_frame(global.itemY));
+	hud_draw_button(btn_x + (sw + btn_gap) * 2, btn_y, 1, sword_spr, global.swordTier - 1);
+	hud_draw_button(btn_x + (sw + btn_gap) * 3, btn_y, 0, item_get_sprite(global.itemA), item_get_frame(global.itemA));
 
 	//Counters, two columns centred in the space between: money over bombs, keys over arrows.
 	//Bombs and arrows are spaced for the biggest bag and quiver (64 and 80).
 	var col_gap = 6;
 	var col1_w = max(hud_counter_width(global.pMoneyMax), hud_counter_width(64));
 	var col2_w = max(hud_counter_width(global.pKeysMax), hud_counter_width(80));
-	var left = life_x + hearts_w;
+	var left = max(life_x + hearts_w, life_x + HUD_MAGIC_LEN_UP + 18);	//past the hearts, and the long magic meter's "3x"
 	var cx = left + (btn_x - left - (col1_w + col_gap + col2_w)) div 2;
 	var row1 = 6;
 	var row2 = 18;
@@ -194,18 +199,41 @@ function hud_draw_hearts(argument0, argument1) {
 
 ///hud_draw_magic(x, y);
 function hud_draw_magic(argument0, argument1) {
-	//Fill is stretched across the frame's inside (2px border on each side)
+	//Fill is stretched across the frame's inside (2px border on each side).
+	//After the magic upgrade (it triples the magic, see magic_upgraded) the meter is a little
+	//longer (HUD_MAGIC_LEN_UP) and a small "3x" sits after it.
 	var xx = argument0;
 	var yy = argument1;
-	var len = sprite_get_width(spr_hud_magic_frame) - 4;
+	var fw = sprite_get_width(spr_hud_magic_frame);
+	var fh = sprite_get_height(spr_hud_magic_frame);
+	var up = magic_upgraded();
+	var total = up ? HUD_MAGIC_LEN_UP : fw;
+	var len = total - 4;
 	var fill = 0;
 	if (global.pMagicMax > 0) {
 		fill = floor(len * global.pMagic / global.pMagicMax);
 	}
 
-	draw_sprite(spr_hud_magic_frame, 0, xx, yy);
+	if (up) {
+		//The frame's ends as they are, its middle column stretched in between
+		var cap = 4;
+		draw_sprite_part(spr_hud_magic_frame, 0, 0, 0, cap, fh, xx, yy);
+		draw_sprite_part_ext(spr_hud_magic_frame, 0, cap, 0, 1, fh, xx + cap, yy, total - cap * 2, 1, c_white, 1);
+		draw_sprite_part(spr_hud_magic_frame, 0, fw - cap, 0, cap, fh, xx + total - cap, yy);
+	} else {
+		draw_sprite(spr_hud_magic_frame, 0, xx, yy);
+	}
 	if (fill > 0) {
 		draw_sprite_ext(spr_hud_magic_fill, 0, xx + 2, yy + 2, fill, 1, 0, c_white, 1);
+	}
+	//"3x" (the counters' digits, with their shadow)
+	if (up) {
+		var dx = xx + total + 2;
+		var dy = yy;
+		draw_sprite_ext(spr_hud_digits, 3, dx + 1, dy + 1, 1, 1, 0, c_black, 1);
+		draw_sprite(spr_hud_digits, 3, dx, dy);
+		draw_sprite_ext(spr_hud_digits, 10, dx + 8, dy + 1, 1, 1, 0, c_black, 1);
+		draw_sprite(spr_hud_digits, 10, dx + 7, dy);
 	}
 
 
@@ -244,14 +272,11 @@ function hud_draw_counter(argument0, argument1, argument2, argument3) {
 ///hud_draw_button(x, y, button, item_sprite, item_frame);
 function hud_draw_button(argument0, argument1, argument2, argument3, argument4) {
 	//Zelda 1 style item box with the button glyph sitting on its top edge.
-	//button: 0 = A, 1 = B, 2 = Y. item_sprite: -1 for an empty slot.
-	//spr_hud_glyph frames: 0 Z key, 1 X key, 2 C key, 3 pad A, 4 pad B, 5 pad Y.
+	//button: 0 = A, 1 = B, 2 = Y, 3 = X. item_sprite: -1 for an empty slot.
 	//The item is drawn 2px inside the slot's border.
 	var xx = argument0;
 	var yy = argument1;
 	var spr = argument3;
-	var glyph = argument2;
-	if (global.input_using_pad) {glyph += 3}
 
 	var gw = sprite_get_width(spr_hud_glyph);
 	var gh = sprite_get_height(spr_hud_glyph);
@@ -261,7 +286,22 @@ function hud_draw_button(argument0, argument1, argument2, argument3, argument4) 
 	if (spr != -1) {
 		draw_sprite(spr, argument4, xx + 2 + sprite_get_xoffset(spr), sy + 2 + sprite_get_yoffset(spr));
 	}
-	draw_sprite(spr_hud_glyph, glyph, xx + (sprite_get_width(spr_hud_slot) - gw) div 2, yy);
+	hud_draw_glyph(argument2, xx + (sprite_get_width(spr_hud_slot) - gw) div 2, yy);
+
+
+}
+
+///hud_draw_glyph(button, x, y);
+function hud_draw_glyph(argument0, argument1, argument2) {
+	//A button's glyph (9x9), keyboard or gamepad (whichever was used last).
+	//button: 0 = A, 1 = B, 2 = Y, 3 = X.
+	//spr_hud_glyph frames: 0 Z key, 1 X key, 2 C key, 3 pad A, 4 pad B, 5 pad Y.
+	//spr_hud_glyph_x frames: 0 V key, 1 pad X.
+	if (argument0 == 3) {
+		draw_sprite(spr_hud_glyph_x, global.input_using_pad ? 1 : 0, argument1, argument2);
+		return;
+	}
+	draw_sprite(spr_hud_glyph, argument0 + (global.input_using_pad ? 3 : 0), argument1, argument2);
 
 
 }

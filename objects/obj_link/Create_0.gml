@@ -38,6 +38,7 @@ global.arrowLevel = 0;
 global.item_have = array_create(ITEM.COUNT, false);
 global.itemA = ITEM.NONE;
 global.itemY = ITEM.NONE;
+global.itemX = ITEM.NONE;	//the third item button (V / pad X)
 global.shieldTier = 0;	//the shield is an item, see shield_set_tier
 global.bottles = array_create(BOTTLES, BOTTLE.EMPTY);	//what's in each bottle
 item_give(ITEM.BOW);
@@ -119,6 +120,14 @@ hop_level = 0;
 hurt_timer = 0;
 kb_dir = 0;
 
+//The sword (see player_sword_start): a B press remembered for a few steps, steps charging the spin attack
+sword_buffer = 0;
+spin_t = 0;
+hold_b = false;
+
+//Hit by a frost wizard's ice: slower for a moment (see magic_bolt_step)
+chill_timer = 0;
+
 //Upper/lower floor in dungeons (see the levels script).
 //base_depth is the normal draw depth, used in rooms without levels.
 level = 0;
@@ -132,3 +141,10 @@ entry_y = y;
 if (!instance_exists(obj_hud_main)) {
 	instance_create_depth(0,0,-100,obj_hud_main);
 }
+
+
+//The timed states (hurt, attack, item use...) put this sprite back when they end. Set here too, so being
+//hit straight out of a boots dash or charge (which don't set it) has something to go back to.
+spr_prev = sprite_index;
+cnt = 0;
+dur = 0;

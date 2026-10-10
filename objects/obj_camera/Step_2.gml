@@ -5,6 +5,7 @@ if (!instance_exists(obj_link)) exit;
 //Dungeons: free camera inside zones, slide between them (see cam_zones)
 if (instance_exists(obj_cam_zone)) {
 	cam_zone_step(view_camera[0]);
+	feel_camera_apply(view_camera[0]);
 	exit;
 }
 
@@ -31,3 +32,4 @@ if(abs(y - target_y) <camspd){
 }
 
 camera_set_view_pos(view_camera[0],x,y);
+feel_camera_apply(view_camera[0]);	//screen shake (see the game_feel script)

@@ -1,14 +1,15 @@
 //The armorer in Haven village: makes Link's armor better, for money (his stock is the "armor" shop,
-//see shop_goods_list). Blue chain-mail (level 2) once the Bog Tower is free, golden armor (level 3)
-//once the Tower of Ladhellin is. The armorer is an obj_npc with  dialogue = dlg_armorer;
+//see shop_goods_list). Blue chain-mail (level 2) and the big shield once the Bog Tower is free, golden
+//armor (level 3) once the Tower of Ladhellin is. (The mirror shield is in the Castle of Bunsriel.) The armorer is an obj_npc with  dialogue = dlg_armorer;
 //(make_overworld_room.py puts him at his stall in the market).
 
 #macro ARMOR_PRICE_2 400
 #macro ARMOR_PRICE_3 900
+#macro SHIELD_PRICE_2 300
 
 ///dlg_armorer();
 function dlg_armorer() {
-	if (global.armorTier >= ARMOR_TIER_MAX) {
+	if (global.armorTier >= ARMOR_TIER_MAX && global.shieldTier >= 2) {
 		return ["THAT GOLDEN ARMOR IS THE FINEST THING I'VE EVER MADE. WEAR IT WELL, SIR GIGGLEBUNS."];
 	}
 	if (!flag_get(boss_flag(2))) {

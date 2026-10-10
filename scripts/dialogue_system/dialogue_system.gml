@@ -11,7 +11,8 @@
 //	dlg_if("flag", [steps], [steps])	the first steps if the flag is set (see flag_get), the second if not.
 //										The flag can also be a function that returns true or false.
 //	dlg_set("flag")						sets a flag. dlg_set("flag", false) clears it, dlg_set("flag", 3) for numbers.
-//	dlg_run(function() {...})			runs some code, like dlg_run(function() {player_add_money(10)})
+//	dlg_run(function() {...})			runs some code, like dlg_run(function() {player_add_money(10)}). The frozen
+//										game is woken up while it runs, so it can reach any instance.
 //	dlg_end()							ends the conversation here
 //	dlg_shop("goods")					opens a shop's counter (see the shop script)
 //
@@ -97,6 +98,28 @@ function dialogue_start(argument0) {
 
 }
 
+///dialogue_run_awake(function);
+function dialogue_run_awake(argument0) {
+	//Run by obj_dialogue for a dlg_run step. The game is frozen (deactivated), so with (obj_...) and
+	//instance_exists wouldn't see anything: wake it all up for the call, then put back to sleep what
+	//was asleep. Anything the code creates stays awake (like obj_fishing, or a room fade).
+	var f = argument0;
+	var awake = {};
+	with (all) {variable_struct_set(awake, string(id), true)}
+	instance_activate_all();
+	var asleep = [];
+	with (all) {
+		if (!variable_struct_exists(awake, string(id))) {array_push(asleep, id)}
+	}
+	//Call methods directly: script_execute drops what they're bound to
+	if (is_method(f)) {f()} else {script_execute(f)}
+	for (var i = 0; i < array_length(asleep); i++) {
+		if (instance_exists(asleep[i])) {instance_deactivate_object(asleep[i])}
+	}
+
+
+}
+
 ///dialogue_advance();
 function dialogue_advance() {
 	//Run by obj_dialogue. Plays steps until one shows a box, setting flags and running code
@@ -132,8 +155,7 @@ function dialogue_advance() {
 				flag_set(s.flag, s.value);
 				break;
 			case "run":
-				//Call methods directly: script_execute drops what they're bound to
-				if (is_method(s.func)) {s.func()} else {script_execute(s.func)}
+				dialogue_run_awake(s.func);
 				break;
 			case "end":
 				stack = [];

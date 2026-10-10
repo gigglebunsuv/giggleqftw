@@ -3,6 +3,8 @@
 //(boss_object = obj_sphinx; in the arena's Creation Code).
 
 event_inherited();
+is_boss = true;	//longer hitstop, a shake, no drops (see enemy_hurt)
+drops = false;
 hp = SPHINX_HP;
 hp_max = SPHINX_HP;
 hp_last = hp;

@@ -7,6 +7,11 @@ draw_set_font(menu_font);
 draw_set_halign(fa_left);
 draw_set_valign(fa_top);
 
+if (debug) {
+	debug_menu_draw();
+	exit;
+}
+
 pause_draw_tabs();
 switch (page) {
 	case 0: pause_draw_items(); break;

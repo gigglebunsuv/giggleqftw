@@ -57,9 +57,10 @@ function save_read(argument0) {
 ///save_summary(slot);
 function save_summary(argument0) {
 	//What the file select shows for a slot: {used, name, hearts, bun (array of 3 true/false),
-	//sword (tier, 0 = none yet), time (seconds played), deaths}
+	//sword (tier, 0 = none yet), time (seconds played), deaths, cleared (the Evil King beaten)}
 	var data = save_read(argument0);
-	var s = {used: false, name: "", hearts: 0, bun: array_create(BUN_PIECES, false), sword: 0, time: 0, deaths: 0};
+	var s = {used: false, name: "", hearts: 0, bun: array_create(BUN_PIECES, false), sword: 0, time: 0, deaths: 0, cleared: false,
+		hero: false, hero_clear: false, echoes: false, done: 0};
 	if (data == undefined) return s;
 	s.used = true;
 	s.name = save_get(data, "name", "");
@@ -68,6 +69,14 @@ function save_summary(argument0) {
 	s.sword = save_get(data, "sword", 0);
 	s.time = save_get(data, "play_time", 0);
 	s.deaths = save_get(data, "deaths", 0);
+	var flags = save_get(data, "flags", {});
+	if (is_struct(flags)) {
+		s.cleared = save_get(flags, GAME_CLEAR_FLAG, false);
+		s.hero = save_get(flags, HERO_FLAG, false);
+		s.hero_clear = save_get(flags, HERO_CLEAR_FLAG, false);
+		s.echoes = save_get(flags, ECHOES_FLAG, false);
+	}
+	s.done = completion_percent(data);
 	return s;
 
 
@@ -123,6 +132,7 @@ function save_collect() {
 		item_have: save_array_fit(global.item_have, ITEM.COUNT, false),
 		item_a: global.itemA,
 		item_y: global.itemY,
+		item_x: global.itemX,
 		bottles: save_array_fit(global.bottles, array_length(global.bottles), BOTTLE.EMPTY),
 		sword: global.swordTier,
 		shield: global.shieldTier,
@@ -181,7 +191,7 @@ function save_reset_progress() {
 	//so nothing from a game played earlier this session carries over
 	global.pHealthMax = 6;
 	global.pHealth = 6;
-	global.pMagicMax = 32;
+	global.pMagicMax = MAGIC_BASE;
 	global.pMagic = global.pMagicMax;
 	global.pMoney = 0;
 	global.pKeys = 0;
@@ -194,6 +204,7 @@ function save_reset_progress() {
 	global.item_have = array_create(ITEM.COUNT, false);
 	global.itemA = ITEM.NONE;
 	global.itemY = ITEM.NONE;
+	global.itemX = ITEM.NONE;
 	global.bottles = array_create(array_length(global.bottles), BOTTLE.EMPTY);
 	global.swordTier = 0;
 	global.shieldTier = 0;
@@ -207,6 +218,13 @@ function save_reset_progress() {
 	global.flags = {};
 	global.playTime = 0;
 	global.deaths = 0;
+	//A Hall of Echoes rush left running (quit mid-rush: game_restart keeps globals) is over
+	global.rush_stage = 0;
+	with (obj_echo_rush) {instance_destroy()}
+	//...and so is anything the ending or the opening left on (the HUD hidden after the credits)
+	global.hud_hidden = false;
+	global.cutscene_on = false;
+	global.cutscene_skip = false;
 	dungeon_init();
 
 
@@ -231,6 +249,7 @@ function save_apply(argument0) {
 	global.item_have = save_array_fit(save_get(d, "item_have", []), ITEM.COUNT, false);
 	global.itemA = save_get(d, "item_a", ITEM.NONE);
 	global.itemY = save_get(d, "item_y", ITEM.NONE);
+	global.itemX = save_get(d, "item_x", ITEM.NONE);
 	global.bottles = save_array_fit(save_get(d, "bottles", []), array_length(global.bottles), BOTTLE.EMPTY);
 	global.swordTier = save_get(d, "sword", 0);
 	global.shieldTier = save_get(d, "shield", 0);
@@ -280,13 +299,14 @@ function save_start_link(argument0, argument1) {
 
 }
 
-///save_new_game(slot, name);
-function save_new_game(argument0, argument1) {
+///save_new_game(slot, name, hero);
+function save_new_game(argument0, argument1, argument2) {
 	//PLAY on an empty file: a brand new game with this name, saved straight away,
-	//starting in Link's bed with the opening (see the cutscene script)
+	//starting in Link's bed with the opening (see the cutscene script). hero: a Hero Mode file.
 	save_start_link(HOME_GETUP_X, HOME_GETUP_Y);
 	save_reset_progress();
 	world_start_new_game();
+	if (argument2 == true) {flag_set(HERO_FLAG, true)}
 	global.player_name = argument1;
 	global.save_slot = argument0;
 	save_write(argument0);

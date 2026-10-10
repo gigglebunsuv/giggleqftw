@@ -41,10 +41,11 @@
 function level_wall_at(argument0, argument1, argument2) {
 	//True if the calling instance would hit a wall for this level at (x, y)
 	if (place_meeting(argument0, argument1, obj_wall)) return true;
-	//Deep water: Link needs the flippers, walking enemies can't go in, everything else flies over
+	//Deep water: Link needs the flippers (or the ice rod's floes), walking enemies can't go in,
+	//everything else flies over
 	if (place_meeting(argument0, argument1, obj_water)) {
 		if (object_index == obj_link) {
-			if (!global.hasFlippers) return true;
+			if (!global.hasFlippers && water_open_at(argument0, argument1)) return true;
 		} else if (object_is_ancestor(object_index, obj_enemy) && level != -1) {
 			return true;
 		}

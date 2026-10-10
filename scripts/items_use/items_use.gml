@@ -24,7 +24,9 @@ enum PICKUP {
 	MONEY1,
 	MONEY5,
 	MONEY20,
-	MAGIC
+	MAGIC,
+	BOMBS,	//PICKUP_BOMBS bombs (enemies only drop it once Link has bombs)
+	ARROWS	//PICKUP_ARROWS arrows (once he has the bow)
 }
 
 #macro BOTTLES 5
@@ -36,6 +38,8 @@ enum PICKUP {
 #macro ICE_FREEZE_TIME 150		//steps an enemy stays frozen (30 steps = 1 second)
 #macro FLUTE_SONG_TIME 45		//steps the song plays before the warp menu opens
 #macro PICKUP_LIFE 300			//steps before a pickup disappears
+#macro PICKUP_BOMBS 4
+#macro PICKUP_ARROWS 5
 
 ///item_magic_spend(amount);
 function item_magic_spend(argument0) {
@@ -325,14 +329,55 @@ function item_use_cape() {
 
 ///item_use_mirror();
 function item_use_mirror() {
-	//Back to where Link came into this room (a dungeon's entrance when in a dungeon)
-	if (point_distance(x, y, entry_x, entry_y) < 16) return false;
+	//Back to the dungeon's entrance, inside its front door. Only inside a dungeon, and never in a
+	//boss's room (or while a boss is about), a cutscene or the Hall of Echoes (see mirror_allowed).
+	if (!mirror_allowed()) {
+		sfx_play(SFX_BONK);
+		return false;
+	}
+	var e = dungeon_entrance(global.dungeon);
+	if (point_distance(x, y, e[1], e[2]) < 16) return false;
 	sfx_play(SFX_MIRROR);
-	x = entry_x;
-	y = entry_y;
+	x = e[1];
+	y = e[2];
+	dir = "down";
+	sprite_index = player_get_sprite(dir);
+	move_frac_x = 0;
+	move_frac_y = 0;
 	if (level_room_uses_levels()) {level_set(0)}
+	safe_x = x;
+	safe_y = y;
+	safe_level = 0;
+	entry_x = x;
+	entry_y = y;
 	camera_snap();
+	dungeon_step();
 	item_pause(10);
+	return true;
+
+
+}
+
+///mirror_allowed();
+function mirror_allowed() {
+	//Run by obj_link: can the magic mirror be used right here?
+	if (global.dungeon <= 0) return false;
+	var e = dungeon_entrance(global.dungeon);
+	if (e[0] != room) return false;
+	if (instance_exists(obj_cutscene) || instance_exists(obj_king_defeat) || instance_exists(obj_dialogue)) return false;
+	if (variable_global_exists("rush_stage") && global.rush_stage > 0) return false;	//the Hall of Echoes' boss rush
+	//A boss's room (beaten or not), or a boss about in this room (the Archmage's study)
+	var z = global.cam_zone;
+	if (z != noone && instance_exists(z)) {
+		var in_arena = false;
+		with (obj_boss_arena) {
+			if (point_in_rectangle(x, y, z.bbox_left, z.bbox_top, z.bbox_right, z.bbox_bottom)) {in_arena = true}
+		}
+		with (obj_enemy) {
+			if (is_boss && point_in_rectangle(x, y, z.bbox_left, z.bbox_top, z.bbox_right, z.bbox_bottom)) {in_arena = true}
+		}
+		if (in_arena) return false;
+	}
 	return true;
 
 
@@ -342,6 +387,8 @@ function item_use_mirror() {
 
 ///pickup_create(kind, x, y);
 function pickup_create(argument0, argument1, argument2) {
+	//Hero Mode: no hearts, ever (they turn into money)
+	if (argument0 == PICKUP.HEART && hero_mode()) {argument0 = PICKUP.MONEY1}
 	var p = instance_create_depth(argument1, argument2, -10, obj_pickup);
 	if (instance_exists(obj_link)) {p.depth = obj_link.depth}
 	p.kind = argument0;
@@ -358,11 +405,14 @@ function pickup_collect(argument0) {
 		case PICKUP.MONEY1: player_add_money(1); break;
 		case PICKUP.MONEY5: player_add_money(5); break;
 		case PICKUP.MONEY20: player_add_money(20); break;
-		case PICKUP.MAGIC: player_add_magic(8); break;
+		case PICKUP.MAGIC: player_add_magic(max(8, global.pMagicMax div 4)); break;	//a quarter of the meter
+		case PICKUP.BOMBS: player_add_bombs(PICKUP_BOMBS); break;
+		case PICKUP.ARROWS: player_add_arrows(PICKUP_ARROWS); break;
 	}
 	switch (argument0) {
 		case PICKUP.HEART: sfx_play(SFX_HEART); break;
 		case PICKUP.MAGIC: sfx_play(SFX_MAGIC); break;
+		case PICKUP.BOMBS: case PICKUP.ARROWS: sfx_play(SFX_ITEM_GET); break;
 		default: sfx_play(SFX_MONEY); break;
 	}
 
@@ -394,6 +444,12 @@ function treasure_collect() {
 			case "quiver": player_upgrade_arrows(); break;
 			case "heart": player_add_heart(); break;
 			case "heart_piece": heart_piece_collect(); break;
+			case "magic_up": player_upgrade_magic(); break;
+			case "tunic":
+				flag_set(TUNIC_FLAG, true);
+				flag_set(TUNIC_ON_FLAG, true);
+				break;
+			case "echo_charm": flag_set(ECHO_CHARM_FLAG, true); break;
 			case "ore": global.swordOre += amount; break;
 			case "medal": flag_set(QUEST_MEDAL_FLAG, true); break;
 			case "bun":
@@ -427,7 +483,7 @@ function treasure_fanfare() {
 		case "heart": case "heart_piece": return SFX_HEART_CONTAINER;
 		case "bun": return SFX_FANFARE_BUN;
 		case "sword": case "shield": case "armor": case "gloves": case "flippers": case "boots":
-		case "bomb_bag": case "quiver": case "boss_key": case "ore": case "medal":
+		case "bomb_bag": case "quiver": case "boss_key": case "ore": case "medal": case "magic_up": case "tunic": case "echo_charm":
 			return SFX_FANFARE_ITEM;
 	}
 	return SFX_ITEM_GET;
@@ -452,6 +508,9 @@ function treasure_icon() {
 		case "quiver": return [spr_item_bow, 0];
 		case "heart": return [spr_heart_container, 0];
 		case "heart_piece": return [spr_heart_piece, 0];
+		case "magic_up": return [spr_magic_upgrade, 0];
+		case "tunic": return [spr_menu_tunic, 0];
+		case "echo_charm": return [spr_echo_charm, 0];
 		case "ore": return [spr_star_iron, 0];
 		case "medal": return [spr_quest_item, 0];
 		case "bun": return [spr_menu_bun, 1];

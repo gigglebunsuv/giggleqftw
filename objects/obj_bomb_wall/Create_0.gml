@@ -4,3 +4,5 @@
 //(or floor), since this draws the wall itself and the tiles show once it's gone.
 
 depth = DEPTH_DECOR;
+//Broken before: it stays broken (its flag, see bomb_explode)
+if (flag_get(door_flag())) {instance_destroy()}

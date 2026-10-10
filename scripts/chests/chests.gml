@@ -121,6 +121,9 @@ function chest_item_name() {
 		case "quiver": return "BIGGER QUIVER";
 		case "heart": return "HEART CONTAINER";
 		case "heart_piece": return "PIECE OF HEART";
+		case "magic_up": return "MAGIC UPGRADE";
+		case "tunic": return "BUNNY TUNIC";
+		case "echo_charm": return "ECHO CHARM";
 		case "ore": return "STAR IRON";
 		case "medal": return "KNIGHT'S MEDAL";
 		case "bun": return "PIECE OF THE BUN";
@@ -154,13 +157,16 @@ function chest_item_desc() {
 		case ITEM.HAMMER: return "POUND WOODEN PEGS FLAT, AND BONK ENEMIES.";
 		case ITEM.SHOVEL: return "DIG THE GROUND IN FRONT OF YOU. SOMETHING MIGHT BE BURIED!";
 		case ITEM.CAPE: return "PRESS ITS BUTTON TO JUMP OVER A ONE TILE PIT.";
-		case ITEM.MIRROR: return "TAKES YOU BACK TO WHERE YOU CAME INTO THIS AREA.";
+		case ITEM.MIRROR: return "IN A DUNGEON, IT TAKES YOU BACK TO THE ENTRANCE IN A FLASH. IT WON'T WORK IN A BOSS'S ROOM.";
 		case ITEM.LENS: return "HOLD ITS BUTTON TO SEE THROUGH MIRAGES: HIDDEN PATHS, FALSE FLOORS AND WALLS. USES MAGIC.";
 	}
 	switch (equip) {
-		case "bottle": return "DRINK IT WHEN YOU NEED IT. PUT IT ON A OR Y IN THE PAUSE MENU.";
+		case "bottle": return "DRINK IT WHEN YOU NEED IT. PUT IT ON A, Y OR X IN THE PAUSE MENU.";
 		case "sword": return "YOUR SWORD HITS HARDER NOW!";
-		case "shield": return "HOLD ITS BUTTON TO RAISE IT AND BLOCK ATTACKS FROM THE FRONT.";
+		case "shield":
+			if (tier >= 3) return "IT BOUNCES A WIZARD'S SPELLS RIGHT BACK AT THEM!";
+			if (tier == 2) return "IT COVERS MORE OF YOU, AND IT CAN HOLD OFF A WIZARD'S MAGIC.";
+			return "HOLD ITS BUTTON TO RAISE IT AND BLOCK ATTACKS FROM THE FRONT.";
 		case "armor": return "ENEMIES DO LESS DAMAGE NOW.";
 		case "gloves": return "WALK INTO A HEAVY ROCK TO LIFT IT. PRESS ANY BUTTON TO THROW IT.";
 		case "flippers": return "NOW YOU CAN SWIM IN DEEP WATER!";
@@ -169,6 +175,9 @@ function chest_item_desc() {
 		case "quiver": return "YOU CAN CARRY MORE ARROWS NOW.";
 		case "heart": return "YOUR LIFE WENT UP BY ONE HEART!";
 		case "heart_piece": return heart_piece_desc();
+		case "magic_up": return "YOUR MAGIC METER NOW HOLDS THREE TIMES AS MUCH MAGIC!";
+		case "tunic": return "SOFT AND FLUFFY, WITH LITTLE EARS. PUT IT ON OR TAKE IT OFF ON THE PAUSE SCREEN'S QUEST PAGE. IT'S JUST FOR LOOKS: YOUR ARMOR STILL PROTECTS YOU.";
+		case "echo_charm": return "THE ECHOES OF EVERY GUARDIAN WATCH OVER YOU NOW. YOU TAKE HALF THE DAMAGE FROM EVERYTHING.";
 		case "medal": return "THE KNIGHT LEFT IT DOWN HERE FOR HIS SQUIRES TO FIND. TAKE IT BACK TO HIM AT THE VILLAGE'S NORTH GATE.";
 		case "ore": return "A LUMP OF IRON THAT FELL FROM THE STARS. THE SMITH IN HAVEN VILLAGE CAN FORGE IT INTO YOUR SWORD.";
 		case "bun": return "FIND EVERY PIECE TO OPEN THE WAY TO THE HIDDEN FOREST.";

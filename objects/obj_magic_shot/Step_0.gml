@@ -22,9 +22,19 @@ if (kind == SHOT.LANTERN || kind == SHOT.FIRE) {
 }
 if (kind == SHOT.LANTERN) exit;	//the lantern's flame doesn't hurt anything
 
-if (level_wall_at(x, y, level)) {
+//The rods' tricks (see the puzzles script): fire melts ice and burns barricades, ice freezes deep
+//water and flame jets, lightning charges posts and strikes crystal switches and lightning gates
+if (rod_shot_tricks()) {
 	instance_destroy();
 	exit;
+}
+
+//Lightning goes on through the metal posts it charges
+if (kind != SHOT.LIGHTNING || instance_place(x, y, obj_lightning_post) == noone) {
+	if (level_wall_at(x, y, level)) {
+		instance_destroy();
+		exit;
+	}
 }
 
 var e = instance_place(x, y, obj_enemy);
@@ -34,20 +44,23 @@ if (e != noone && (e.level == -1 || e.level == level)) {
 		if (hit[i] == e) {already = true}
 	}
 	if (!already) {
+		//Some enemies are weak to one of the rods (see rod_enemy_damage)
 		switch (kind) {
 			case SHOT.FIRE:
-				enemy_hurt(e, 4, x, y);
+				enemy_hurt(e, rod_enemy_damage(e, kind, 4), x, y);
 				instance_destroy();
 				exit;
 			case SHOT.ICE:
-				enemy_hurt(e, 1, x, y);
-				if (instance_exists(e)) {enemy_stun(e, ICE_FREEZE_TIME)}
+				var freeze = rod_enemy_freeze_time(e);
+				enemy_hurt(e, rod_enemy_damage(e, kind, 1), x, y);
+				if (instance_exists(e)) {enemy_stun(e, freeze)}
 				instance_destroy();
 				exit;
 			case SHOT.LIGHTNING:
 				//Goes straight through, hitting each enemy once
 				array_push(hit, e);
-				enemy_hurt(e, 3, x, y);
+				var zap = rod_enemy_damage(e, kind, 3);
+				if (zap > 0) {enemy_hurt(e, zap, x, y)}
 				if (instance_exists(e)) {enemy_stun(e, 30)}
 				break;
 		}

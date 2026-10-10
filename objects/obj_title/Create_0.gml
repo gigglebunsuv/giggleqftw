@@ -11,6 +11,11 @@ debug_choices = [
 	["SOUTHERN TOWER", rm_southern_tower, TOWER_START_X, TOWER_START_Y, dungeon_start_southern_tower],
 	["BOG TOWER", rm_bog_tower, BOG_START_X, BOG_START_Y, dungeon_start_bog_tower],
 	["LADHELLIN", rm_ladhellin_tower, LADHELLIN_START_X, LADHELLIN_START_Y, dungeon_start_ladhellin],
+	["CASTLE", rm_castle, CASTLE_START_X, CASTLE_START_Y, dungeon_start_castle],
+	["ARCANUM: FLAME", rm_arcanum, ARCANUM_START_X, ARCANUM_START_Y, function() {dungeon_start_arcanum(1)}],
+	["ARCANUM: FROST", rm_arcanum, ARCANUM_START_X, ARCANUM_START_Y, function() {dungeon_start_arcanum(2)}],
+	["ARCANUM: STORM", rm_arcanum, ARCANUM_START_X, ARCANUM_START_Y, function() {dungeon_start_arcanum(3)}],
+	["HALL OF ECHOES", rm_interiors, ECHOES_X, ECHOES_Y, function() {dungeon_start_castle(); flag_set(GAME_CLEAR_FLAG, true); flag_set(boss_flag(1), true); flag_set(boss_flag(2), true); flag_set(boss_flag(3), true);}],
 	["TEST DUNGEON", rm_test_dungeon, 384, 640],
 	["DEBUG ROOM", rm_debug, DEBUG_START_X, DEBUG_START_Y],
 	["ITEM TEST", rm_item_test, 264, 184],
@@ -25,6 +30,8 @@ fs_action = 0;		//0 START, 1 ERASE
 fs_confirm = 0;		//erase? 0 NO, 1 YES
 fs_slots = [];
 name_text = "";		//name entry
+fs_name = "";		//the name, on the NORMAL / HERO screen
+fs_hero = 0;		//0 NORMAL, 1 HERO
 name_col = 0;
 name_row = 0;
 options_open(16);	//the Options box fills the window (200 tall: 16 lines of controls)

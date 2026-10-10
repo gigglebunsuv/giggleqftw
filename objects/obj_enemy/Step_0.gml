@@ -2,6 +2,18 @@
 //Children run event_inherited() first, then skip their own AI while
 //active is false or kb_timer > 0.
 
+//The dungeon's toughness (see enemy_tier_apply), once its own Create has set its health
+if (!tier_done) {
+	tier_done = true;
+	enemy_tier_apply();
+}
+
+//Hitstop: everything holds still for a moment when a hit lands (see the game_feel script)
+if (feel_frozen()) {
+	active = false;
+	exit;
+}
+
 active = enemy_is_active();
 if (!active) exit;
 
@@ -31,9 +43,11 @@ if (kb_timer > 0) {
 
 if (!instance_exists(obj_link)) exit;
 
-//Hit by the sword (damage = sword tier)
-if (can_touch && place_meeting(x, y, obj_sword) && enemy_same_level(obj_link.level)) {
-	enemy_hurt(id, global.swordTier, obj_link.x, obj_link.y);
+//Hit by the sword (a swing does the sword's tier, the spin attack double, see obj_sword)
+var blade = instance_place(x, y, obj_sword);
+if (can_touch && blade != noone && enemy_same_level(obj_link.level)) {
+	if (hurt_timer <= 0 && !invulnerable) {feel_hitstop(HITSTOP_HIT)}
+	enemy_hurt(id, blade.damage, obj_link.x, obj_link.y);
 	if (hp <= 0) exit;
 }
 

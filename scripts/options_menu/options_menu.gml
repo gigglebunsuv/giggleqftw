@@ -1,8 +1,10 @@
-//The Options screen: the controls list and the sound volume.
+//The Options screen: the controls list, the sound volume, and the gameplay switches
+//(the low-health beep and screen shake, read at game start by the game_feel script).
 //Shared by the title screen (obj_title) and the pause screen's Settings page (obj_pause_menu):
 //call options_open() when it opens, options_step() each step (after input_get) and
 //options_draw() in Draw GUI with the menu font set.
-//The volume is kept in settings.ini so it stays the same after the game closes or restarts.
+//The volume and switches are kept in settings.ini so they stay the same after the game closes or restarts.
+#macro OPTIONS_ROWS 5	//controls, volume, low-health beep, screen shake, back
 
 #macro OPTIONS_FILE "settings.ini"
 #macro OPTIONS_VOLUME_DEFAULT 10	//percent, until the player changes it
@@ -39,7 +41,7 @@ function options_volume_set(argument0) {
 function options_open(argument0) {
 	//Sets on the calling instance. rows: how many lines of the controls list fit
 	//(the box's height - 40, div 10).
-	opt_cursor = 0;			//0 controls, 1 volume, 2 back
+	opt_cursor = 0;			//0 controls, 1 volume, 2 low-health beep, 3 screen shake, 4 back
 	opt_controls = false;	//showing the controls list
 	opt_binds = input_bind_list();
 	opt_scroll = 0;			//first row shown on the controls list
@@ -76,7 +78,7 @@ function options_step(argument0) {
 	}
 
 	if (menu_move != 0) {
-		opt_cursor = (opt_cursor + menu_move + 3) mod 3;
+		opt_cursor = (opt_cursor + menu_move + OPTIONS_ROWS) mod OPTIONS_ROWS;
 		audio_play_sound(menu_switch, 2, false);
 	}
 
@@ -89,6 +91,14 @@ function options_step(argument0) {
 		}
 	}
 
+	//The switches: left, right or A flips them
+	if ((opt_cursor == 2 || opt_cursor == 3) && (menu_move_h != 0 || argument0)) {
+		if (opt_cursor == 2) {options_switch_set("low_health_beep", !global.opt_beep)}
+		else {options_switch_set("screen_shake", !global.opt_shake)}
+		audio_play_sound(menu_switch, 2, false);
+		return false;
+	}
+
 	if (!argument0) return false;
 	switch (opt_cursor) {
 		case 0:
@@ -96,7 +106,7 @@ function options_step(argument0) {
 			opt_scroll = 0;
 			audio_play_sound(menu_select, 3, false);
 			break;
-		case 2:
+		case 4:
 			audio_play_sound(menu_switch, 2, false);
 			return true;
 	}
@@ -141,7 +151,16 @@ function options_draw(argument0, argument1, argument2, argument3) {
 		draw_set_halign(fa_right);
 		menu_draw_text_colour(bx + bw - 16, vy, string(global.volume), col);
 
-		menu_draw_choice(cx, vy + 32, "BACK", opt_cursor == 2);
+		//--- Gameplay: the switches
+		var gy = vy + 20;
+		draw_set_halign(fa_left);
+		menu_draw_text_colour(bx + 8, gy, "GAMEPLAY", MENU_COL_BORDER);
+		menu_draw_rect(bx + 80, gy + 4, bw - 88, 1, MENU_COL_TRIM_DARK);
+		options_draw_switch(bx, bw, gy + 16, "LOW HEALTH BEEP", global.opt_beep, opt_cursor == 2);
+		options_draw_switch(bx, bw, gy + 28, "SCREEN SHAKE", global.opt_shake, opt_cursor == 3);
+
+		draw_set_halign(fa_center);
+		menu_draw_choice(cx, gy + 52, "BACK", opt_cursor == 4);
 	}
 
 	//Hints along the bottom
@@ -153,6 +172,8 @@ function options_draw(argument0, argument1, argument2, argument3) {
 		menu_draw_text(bx + bw - 8, foot_y, "UP/DOWN: SCROLL");
 	} else if (opt_cursor == 1) {
 		menu_draw_text(bx + bw - 8, foot_y, "LEFT/RIGHT: VOLUME");
+	} else if (opt_cursor == 2 || opt_cursor == 3) {
+		menu_draw_text(bx + bw - 8, foot_y, "LEFT/RIGHT: ON/OFF");
 	}
 	draw_set_halign(fa_left);
 
@@ -230,6 +251,36 @@ function options_draw_controls(argument0, argument1, argument2, argument3) {
 		menu_draw_rect(ax + 1, ay + 1, 4, 1, MENU_COL_BORDER);
 		menu_draw_rect(ax + 2, ay + 2, 2, 1, MENU_COL_BORDER);
 	}
+
+
+}
+
+///options_switch_set(key, on);
+function options_switch_set(argument0, argument1) {
+	//Flips one of the gameplay switches and saves it
+	var v = argument1 ? 1 : 0;
+	if (argument0 == "low_health_beep") {global.opt_beep = v}
+	if (argument0 == "screen_shake") {
+		global.opt_shake = v;
+		if (!v) {global.shake_time = 0}
+	}
+	ini_open(OPTIONS_FILE);
+	ini_write_real("gameplay", argument0, v);
+	ini_close();
+
+
+}
+
+///options_draw_switch(box_x, box_w, y, label, on, selected);
+function options_draw_switch(argument0, argument1, argument2, argument3, argument4, argument5) {
+	//One gameplay switch: its name on the left, ON / OFF on the right
+	var col = c_white;
+	if (argument5) {col = MENU_COL_CURSOR}
+	draw_set_halign(fa_left);
+	menu_draw_text_colour(argument0 + 16, argument2, argument3, col);
+	draw_set_halign(fa_right);
+	menu_draw_text_colour(argument0 + argument1 - 16, argument2, argument4 ? "ON" : "OFF", col);
+	draw_set_halign(fa_left);
 
 
 }
